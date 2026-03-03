@@ -373,11 +373,17 @@ export default function ContactUsSection() {
     mouseY.set(e.clientY + 24)
   }
 
+  // ── FIX: clear activeId when cursor leaves the entire section ──
+  const handleMouseLeave = () => {
+    if (!isMobile) setActiveId(null)
+  }
+
   const active = CONTACTS.find(c => c.id === activeId)
 
   return (
     <div
       onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       style={{
         position: 'relative',
         width: '100%',

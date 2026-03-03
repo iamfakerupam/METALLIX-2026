@@ -48,12 +48,6 @@ function generateEmbers(count: number): Ember[] {
   }));
 }
 
-/*
-  Hydration fix: Math.random() produces different values on server vs client.
-  Solution: start with [] on both sides, then populate only after mount.
-  This means SSR renders no embers (just the glow/SVG), then client hydrates
-  identically (no embers), then useEffect fires and adds them — no mismatch.
-*/
 function useEmbers(count = 18) {
   const [embers, setEmbers] = useState<Ember[]>([]);
   useEffect(() => {
@@ -95,6 +89,7 @@ export const TextHoverEffect = ({
         inset: 0,
         pointerEvents: "none",
         overflow: "hidden",
+        zIndex: 51,
       }}>
         {/* Red glow left */}
         <div style={{
@@ -132,6 +127,7 @@ export const TextHoverEffect = ({
         inset: 0,
         pointerEvents: "none",
         overflow: "hidden",
+        zIndex: 52,
       }}>
         {embers.map((e) => (
           <div
@@ -158,6 +154,7 @@ export const TextHoverEffect = ({
         inset: 0,
         pointerEvents: "none",
         overflow: "hidden",
+        zIndex: 53,
       }}>
         <div style={{
           position: "absolute",
@@ -211,7 +208,7 @@ export const TextHoverEffect = ({
         className={cn("select-none uppercase cursor-pointer", className)}
         style={{
           position: "relative",
-          zIndex: 2,
+          zIndex: 54,
           animation: "ftFlicker 6s ease-in-out infinite",
         }}
       >
@@ -299,8 +296,9 @@ export const TextHoverEffect = ({
 /* ── Background gradient ── */
 export const FooterBg = () => (
   <div
-    className="absolute inset-0 z-0"
+    className="absolute inset-0"
     style={{
+      zIndex: 51,
       background:
         "radial-gradient(120% 120% at 50% 0%, rgba(15,0,0,0.85) 40%, rgba(80,10,140,0.25) 100%)",
     }}
@@ -369,7 +367,7 @@ function SocialBtn({
         textDecoration: "none",
         transition: "border 0.20s ease, background 0.20s ease, color 0.20s ease, box-shadow 0.20s ease",
         position: "relative",
-        zIndex: 30,
+        zIndex: 55,
       }}
     >
       {icon}
@@ -481,7 +479,7 @@ function MetallixFooter() {
   ];
 
   return (
-    <>
+    <div style={{ zIndex: 55, position: "relative" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
         @media (max-width: 768px) {
@@ -505,12 +503,12 @@ function MetallixFooter() {
           position: "absolute", top: 0, left: 0, right: 0, height: 2,
           background: "linear-gradient(90deg, transparent, rgba(220,30,10,0.8) 30%, #fff 50%, rgba(140,20,200,0.6) 70%, transparent)",
           boxShadow: "0 0 18px rgba(220,30,10,0.5)",
-          zIndex: 20,
+          zIndex: 60,
         }} />
 
         {/* Scanline */}
         <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1,
+          position: "absolute", inset: 0, pointerEvents: "none", zIndex: 51,
           backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
         }} />
 
@@ -519,7 +517,7 @@ function MetallixFooter() {
         <div
           className="ft-outer-pad"
           style={{
-            position: "relative", zIndex: 10,
+            position: "relative", zIndex: 56,
             maxWidth: 1200, margin: "0 auto",
             padding: "56px 48px 0",
           }}
@@ -534,7 +532,7 @@ function MetallixFooter() {
               paddingBottom: 48,
               alignItems: "start",
               position: "relative",
-              zIndex: 20,
+              zIndex: 57,
             }}
           >
             {/* COL 1: Brand */}
@@ -654,7 +652,7 @@ function MetallixFooter() {
             background: "linear-gradient(90deg, transparent, rgba(220,30,10,0.4) 30%, rgba(140,20,200,0.22) 70%, transparent)",
             boxShadow: "0 0 6px rgba(140,20,200,0.08)",
             position: "relative",
-            zIndex: 20,
+            zIndex: 57,
           }} />
 
           {/* Bottom bar */}
@@ -668,7 +666,7 @@ function MetallixFooter() {
               padding: "18px 0 20px",
               gap: 12,
               position: "relative",
-              zIndex: 20,
+              zIndex: 57,
             }}
           >
             <p style={{
@@ -689,7 +687,7 @@ function MetallixFooter() {
               marginTop: "-10rem",
               marginBottom: "-8rem",
               pointerEvents: "none",
-              zIndex: 5,
+              zIndex: 58,
               position: "relative",
             }}
           >
@@ -699,7 +697,7 @@ function MetallixFooter() {
           </div>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
 

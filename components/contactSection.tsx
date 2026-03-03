@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useSyncExternalStore } from 'react'
+import React, { useState, useEffect, useSyncExternalStore, useRef } from 'react'
 import ReactDOM from 'react-dom'
 import {
   motion,
@@ -45,7 +45,7 @@ const CONTACTS = [
     phone: '+91 6296344273',
     image: '/swarnendu.jpeg',
   },
-    {
+  {
     id: '05',
     name: 'Bapan Saha',
     position: 'Assistant Treasurer',
@@ -190,11 +190,11 @@ function CursorCard({ active, cursorX, cursorY }: {
   cursorY: ReturnType<typeof useSpring>
 }) {
   const mounted = useSyncExternalStore(
-  () => () => {},
-  () => true,
-  () => false,
-)
-if (!mounted) return null
+    () => () => {},
+    () => true,
+    () => false,
+  )
+  if (!mounted) return null
 
   return ReactDOM.createPortal(
     <div style={{
@@ -205,40 +205,50 @@ if (!mounted) return null
       pointerEvents: 'none',
     }}>
       <motion.div style={{ x: cursorX, y: cursorY }}>
-        <AnimatePresence mode="wait">
+        {/* Single card wrapper — only fades in/out when going from nothing→something or something→nothing */}
+        <AnimatePresence>
           {active && (
             <motion.div
-              key={active.id}
-              initial={{ opacity: 0, scale: 0.92 }}
+              key="cursor-card"
+              initial={{ opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.92 }}
-              transition={{ duration: 0.1, ease: 'easeOut' }}
+              exit={{ opacity: 0, scale: 0.94 }}
+              transition={{ duration: 0.12, ease: 'easeOut' }}
               style={{
-                width: 260,
-                height: 320,
-                borderRadius: 12,
+                width: 210,
+                height: 270,
+                borderRadius: 10,
                 overflow: 'hidden',
                 border: `1px solid rgba(200,25,5,0.35)`,
-                boxShadow: `0 0 0 1px rgba(130,40,210,0.12), 0 24px 60px rgba(0,0,0,0.85)`,
+                boxShadow: `0 0 0 1px rgba(130,40,210,0.12), 0 20px 50px rgba(0,0,0,0.85)`,
                 background: '#050000',
                 position: 'relative',
-                display: 'block',
               }}
             >
-              {/* Layer 1: blurred bg fill */}
-              <div style={{
-                position: 'absolute', inset: 0, zIndex: 0,
-                backgroundImage: `url(${active.image})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                filter: 'blur(18px) brightness(0.18) saturate(1.3)',
-                transform: 'scale(1.12)',
-              }} />
+              {/* Blurred bg — crossfades instantly on contact change via key */}
+              <motion.div
+                key={`bg-${active.id}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0 }}
+                style={{
+                  position: 'absolute', inset: 0, zIndex: 0,
+                  backgroundImage: `url(${active.image})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  filter: 'blur(18px) brightness(0.18) saturate(1.3)',
+                  transform: 'scale(1.12)',
+                }}
+              />
 
-              {/* Layer 2: foreground image */}
-              <img
+              {/* Foreground image — swaps instantly */}
+              <motion.img
+                key={`img-${active.id}`}
                 src={active.image}
                 alt={active.name}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.08 }}
                 style={{
                   position: 'absolute',
                   top: 0, left: 0,
@@ -252,33 +262,39 @@ if (!mounted) return null
                 }}
               />
 
-              {/* Layer 3: top neon line */}
+              {/* Top neon line */}
               <div style={{
                 position: 'absolute', top: 0, left: 0, right: 0, height: 2, zIndex: 4,
                 background: `linear-gradient(90deg, transparent, ${T.red.glow} 40%, ${T.purple.glow} 70%, transparent)`,
                 boxShadow: `0 0 8px ${T.red.glow}`,
               }} />
 
-              {/* Layer 4: left red bar */}
+              {/* Left red bar */}
               <div style={{
                 position: 'absolute', top: 0, left: 0, bottom: 0, width: 2, zIndex: 4,
                 background: `linear-gradient(180deg, transparent, ${T.red.glow}, transparent)`,
                 boxShadow: `0 0 6px ${T.red.glow}`,
               }} />
 
-              {/* Layer 5: bottom gradient fade */}
+              {/* Bottom gradient fade */}
               <div style={{
                 position: 'absolute', inset: 0, zIndex: 2,
-                background: 'linear-gradient(180deg, transparent 40%, rgba(3,0,0,0.97) 100%)',
+                background: 'linear-gradient(180deg, transparent 35%, rgba(3,0,0,0.97) 100%)',
               }} />
 
-              {/* Layer 6: info overlay */}
-              <div style={{
-                position: 'absolute', bottom: 0, left: 0, right: 0,
-                zIndex: 5, padding: '12px 14px',
-              }}>
+              {/* Info overlay — content swaps instantly via key */}
+              <motion.div
+                key={`info-${active.id}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.08 }}
+                style={{
+                  position: 'absolute', bottom: 0, left: 0, right: 0,
+                  zIndex: 5, padding: '10px 12px',
+                }}
+              >
                 {/* Status dot */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 5 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
                   <div style={{
                     width: 5, height: 5, borderRadius: '50%',
                     background: '#22c55e', boxShadow: '0 0 6px #22c55e',
@@ -293,27 +309,27 @@ if (!mounted) return null
 
                 <div style={{
                   fontFamily: "'Orbitron', monospace",
-                  fontSize: 12, fontWeight: 900, letterSpacing: '0.05em',
+                  fontSize: 11, fontWeight: 900, letterSpacing: '0.05em',
                   color: '#fff', marginBottom: 2,
                   textShadow: `0 0 8px rgba(200,25,5,0.6)`,
                 }}>{active.name}</div>
 
                 <div style={{
                   fontFamily: "'Rajdhani', sans-serif",
-                  fontSize: 9, fontWeight: 700, letterSpacing: '0.15em',
-                  textTransform: 'uppercase', color: T.purple.text, marginBottom: 8,
+                  fontSize: 8, fontWeight: 700, letterSpacing: '0.15em',
+                  textTransform: 'uppercase', color: T.purple.text, marginBottom: 7,
                 }}>{active.position}</div>
 
                 <div style={{
                   borderTop: '1px solid rgba(200,25,5,0.18)',
-                  paddingTop: 7,
-                  display: 'flex', flexDirection: 'column', gap: 4,
+                  paddingTop: 6,
+                  display: 'flex', flexDirection: 'column', gap: 3,
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span style={{ color: T.purple.text, display: 'flex', flexShrink: 0 }}><GmailSVG /></span>
                     <span style={{
                       fontFamily: "'Rajdhani', sans-serif",
-                      fontSize: 11, fontWeight: 600,
+                      fontSize: 10, fontWeight: 600,
                       color: 'rgba(255,255,255,0.65)',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     }}>{active.gmail}</span>
@@ -322,12 +338,12 @@ if (!mounted) return null
                     <span style={{ color: T.red.text, display: 'flex', flexShrink: 0 }}><PhoneSVG /></span>
                     <span style={{
                       fontFamily: "'Rajdhani', sans-serif",
-                      fontSize: 11, fontWeight: 600,
+                      fontSize: 10, fontWeight: 600,
                       color: 'rgba(255,255,255,0.65)',
                     }}>{active.phone}</span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -537,7 +553,8 @@ export default function ContactUsSection() {
 
   const mouseX = useMotionValue(-9999)
   const mouseY = useMotionValue(-9999)
-  const springCfg = { damping: 40, stiffness: 600, mass: 0.2 }
+  // Tighter spring so card tracks cursor more tightly — less lag = less "sticking" feeling
+  const springCfg = { damping: 28, stiffness: 800, mass: 0.1 }
   const cursorX = useSpring(mouseX, springCfg)
   const cursorY = useSpring(mouseY, springCfg)
 
@@ -571,9 +588,6 @@ export default function ContactUsSection() {
         padding: 'clamp(40px, 5vw, 72px) clamp(20px, 6vw, 72px)',
         fontFamily: "'Rajdhani', sans-serif",
         cursor: 'default',
-        // ✅ FIXED: removed overflow: 'hidden' — it was creating a stacking context
-        // that clipped position:fixed children (the cursor card portal).
-        // Scanlines and ambient glow are unaffected; they use position:absolute.
       }}
     >
       {/* Scanlines */}

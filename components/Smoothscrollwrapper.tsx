@@ -1,71 +1,110 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+  useMotionValueEvent,
+} from "framer-motion";
 
-export default function SmoothScrollWrapper({ children }: { children: React.ReactNode }) {
+// Extend Window type for scrollToSection
+declare global {
+  interface Window {
+    scrollToSection: (id: string) => void;
+  }
+}
+
+export default function SmoothScrollWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const contentRef = useRef<HTMLDivElement>(null);
-  const spacerRef  = useRef<HTMLDivElement>(null);
+  const spacerRef = useRef<HTMLDivElement>(null);
 
   const { scrollY } = useScroll();
 
   const smoothY = useSpring(scrollY, {
     stiffness: 200,
-    damping:   40,
+    damping: 40,
     restDelta: 0.001,
-    mass:      0.5,
+    mass: 0.5,
   });
 
-  const y = useTransform(smoothY, v => -v);
+  const y = useTransform(smoothY, (v) => -v);
 
-  // ✅ Dispatch a plain custom event every time the RAW scrollY changes.
-  // This completely bypasses the spring so the Navbar always gets the
-  // true scroll position — not the lagged spring value.
-  useEffect(() => {
-    const unsub = scrollY.on("change", (val) => {
-      window.dispatchEvent(
-        new CustomEvent("navscroll", { detail: { scrollY: val } })
-      );
-    });
-    return unsub;
-  }, [scrollY]);
+  // Dispatch raw scroll position to Navbar (bypasses spring lag)
+  useMotionValueEvent(scrollY, "change", (val) => {
+    window.dispatchEvent(new CustomEvent("navscroll", { detail: { scrollY: val } }));
+  });
 
-  // Detect touchpad and snap spring to avoid lag
   useEffect(() => {
-    let isTouchpad = false;
-    let timeout: ReturnType<typeof setTimeout>;
+    let rafId: number;
+    let lastDeltaY = 0;
+    let touchpadFrames = 0; // consecutive touchpad-like frames
 
     const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) < 50 && !Number.isInteger(e.deltaY)) {
-        isTouchpad = true;
-      } else {
-        isTouchpad = false;
-      }
-      if (isTouchpad) smoothY.jump(scrollY.get());
-      clearTimeout(timeout);
-      timeout = setTimeout(() => { isTouchpad = false; }, 200);
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const delta = Math.abs(e.deltaY);
+        const isLikelyTouchpad =
+          delta < 50 ||                         // small increments
+          !Number.isInteger(e.deltaY) ||        // fractional pixels
+          Math.abs(e.deltaY - lastDeltaY) < 5; // smooth acceleration curve
+
+        lastDeltaY = e.deltaY;
+
+        if (isLikelyTouchpad) {
+          touchpadFrames = Math.min(touchpadFrames + 1, 10);
+        } else {
+          touchpadFrames = Math.max(touchpadFrames - 1, 0);
+        }
+
+        // Only snap if we've seen several consecutive touchpad-like frames
+        if (touchpadFrames >= 3) {
+          smoothY.jump(scrollY.get());
+        }
+      });
+    };
+
+    // Touch devices: always snap spring to real position
+    const onTouchMove = () => {
+      smoothY.jump(scrollY.get());
+    };
+
+    // After touch ends, let spring settle from current position
+    const onTouchEnd = () => {
+      smoothY.set(scrollY.get());
     };
 
     window.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+
     return () => {
+      cancelAnimationFrame(rafId);
       window.removeEventListener("wheel", onWheel);
-      clearTimeout(timeout);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
     };
   }, [smoothY, scrollY]);
 
   // Keep spacer height in sync with content height
   useEffect(() => {
-    if (!contentRef.current || !spacerRef.current) return;
+    const content = contentRef.current;
+    const spacer = spacerRef.current;
+    if (!content || !spacer) return;
+
     const ro = new ResizeObserver(() => {
-      if (contentRef.current && spacerRef.current) {
-        spacerRef.current.style.height = `${contentRef.current.scrollHeight}px`;
-      }
+      spacer.style.height = `${content.scrollHeight}px`;
     });
-    ro.observe(contentRef.current);
+    ro.observe(content);
     return () => ro.disconnect();
   }, []);
 
-  // Core scrollToSection
+  // scrollToSection utility
   useEffect(() => {
     window.scrollToSection = (id: string) => {
       const element = document.getElementById(id);
@@ -77,7 +116,6 @@ export default function SmoothScrollWrapper({ children }: { children: React.Reac
         top += el.offsetTop;
         el = el.offsetParent as HTMLElement | null;
       }
-
       window.scrollTo({ top, behavior: "smooth" });
     };
 
@@ -90,17 +128,13 @@ export default function SmoothScrollWrapper({ children }: { children: React.Reac
 
   return (
     <>
-      <div ref={spacerRef} style={{ width: "100%" }} aria-hidden />
+      {/* Spacer — height is driven by JS, only width can use Tailwind */}
+      <div ref={spacerRef} className="w-full" aria-hidden />
+
       <motion.div
         ref={contentRef}
-        style={{
-          y,
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          willChange: "transform",
-        }}
+        style={{ y }}
+        className="fixed inset-x-0 top-0 w-full [will-change:transform]"
       >
         {children}
       </motion.div>

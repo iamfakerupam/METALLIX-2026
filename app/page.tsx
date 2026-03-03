@@ -3,14 +3,15 @@ import { TimelineDemo } from "./Timeline";
 import FAQs from "./Faq";
 import SplashCursor from "@/components/SplashCursor";
 import Sponsors from "@/components/sponsors";
-import SmoothScrollWrapper from "@/components/Smoothscrollwrapper";
 import { HeroVideoDemo } from "./Hero";
 import Navbar from "@/components/Navbar";
 import MetallixFooter from "@/components/Footer";
 import ContactUsSection from "@/components/contactSection";
+import LoadingGate from "./LoadingGate";
 
 export default function Home() {
   return (
+    <LoadingGate >
     <div className="bg-black">
 
       <style>{`
@@ -18,7 +19,7 @@ export default function Home() {
         html { scroll-behavior: auto; }
       `}</style>
  <Navbar/>
-      <SmoothScrollWrapper>
+      {/* <SmoothScrollWrapper> */}
        
         <section id="home"><HeroVideoDemo/></section>
         <SplashCursor/>
@@ -70,8 +71,8 @@ export default function Home() {
           </div>
 
           {/* ── PAGE CONTENT ── */}
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <section id="about"><ImageTrailDemo /></section>
+          <div style={{ position: "relative", zIndex: 100 }}>
+            <section id="about" className="z-100" ><ImageTrailDemo /></section>
 
             <section id="events"><TimelineDemo /></section>
 
@@ -89,12 +90,16 @@ export default function Home() {
               </div>
             </section>
 
-            <section id="faq"><FAQs /></section>
+            <section id="faq" className="z-100"><FAQs /></section>
             <section id="contact"><ContactUsSection /></section>
           </div>
         </div>
-        <MetallixFooter />
-      </SmoothScrollWrapper>
+        <div className="z-100">
+          <MetallixFooter />
+        </div>
+        
+      {/* </SmoothScrollWrapper> */}
     </div>
+    </LoadingGate>
   );
 }

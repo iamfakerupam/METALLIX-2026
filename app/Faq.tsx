@@ -49,7 +49,7 @@ const faqItems = [
 
 export default function FAQs() {
   return (
-    <div id="faq">
+    <div id="faq" style={{ position: 'relative', zIndex: 51 }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
 
@@ -57,6 +57,8 @@ export default function FAQs() {
         .faq-accordion-item {
           border-bottom: 1px solid rgba(255, 26, 26, 0.15) !important;
           transition: background-color 0.2s ease;
+          position: relative;
+          z-index: 53;
         }
         .faq-accordion-item:first-child {
           border-top: 1px solid rgba(255, 26, 26, 0.15);
@@ -72,6 +74,8 @@ export default function FAQs() {
           padding: 18px 0 !important;
           transition: color 0.2s ease !important;
           text-decoration: none !important;
+          position: relative;
+          z-index: 54;
         }
         .faq-trigger:hover {
           color: #ffffff !important;
@@ -101,6 +105,8 @@ export default function FAQs() {
           color: rgba(255, 200, 200, 0.50) !important;
           letter-spacing: 0.02em !important;
           padding-bottom: 18px !important;
+          position: relative;
+          z-index: 54;
         }
 
         .faq-stat-divider {
@@ -111,28 +117,30 @@ export default function FAQs() {
         }
       `}</style>
 
-      <section className="py-20 md:py-28" style={{ position: 'relative' }}>
+      <section className="py-20 md:py-28" style={{ position: 'relative', zIndex: 51 }}>
 
-        {/* Red-dominant section glow, faint violet hint bottom-right */}
+        {/* Background glows — kept below content */}
         <div style={{
           position: 'absolute', top: '10%', left: '50%',
           transform: 'translateX(-50%)',
           width: '60vw', height: '40vw',
           background: 'radial-gradient(ellipse, rgba(180,0,0,0.11) 0%, transparent 70%)',
           pointerEvents: 'none',
+          zIndex: 51,
         }} />
         <div style={{
           position: 'absolute', bottom: '5%', right: '-5%',
           width: '25vw', height: '25vw',
           background: 'radial-gradient(circle, rgba(100,30,160,0.06) 0%, transparent 70%)',
           pointerEvents: 'none',
+          zIndex: 51,
         }} />
 
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 52 }}>
 
           {/* ── Header ── */}
-          <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            {/* Badge — red primary */}
+          <div style={{ textAlign: 'center', marginBottom: 64, position: 'relative', zIndex: 53 }}>
+            {/* Badge */}
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 7,
               backgroundColor: 'rgba(255,26,26,0.08)',
@@ -140,11 +148,12 @@ export default function FAQs() {
               borderRadius: 6, padding: '5px 14px', marginBottom: 20,
               fontFamily: "'Rajdhani', sans-serif", fontSize: 11, fontWeight: 700,
               letterSpacing: '0.2em', color: '#ffb3b3', textTransform: 'uppercase',
+              position: 'relative', zIndex: 54,
             }}>
               <Zap size={10} /> Support Hub
             </div>
 
-            {/* Title — white → red dominant, violet only at tail */}
+            {/* Title */}
             <h2 style={{
               fontFamily: "'Orbitron', monospace",
               fontSize: 'clamp(2rem, 5.5vw, 3.5rem)',
@@ -153,21 +162,24 @@ export default function FAQs() {
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
               textShadow: 'none',
               margin: 0, lineHeight: 1.1,
+              position: 'relative', zIndex: 54,
             }}>
               FREQUENTLY ASKED<br />QUESTIONS
             </h2>
 
-            {/* Rule — red with faint violet tail */}
+            {/* Rule */}
             <div style={{
               width: 180, height: 2, margin: '18px auto 0',
               background: 'linear-gradient(90deg, transparent, #ff1a1a, #cc0000, rgba(110,30,160,0.35), transparent)',
               boxShadow: '0 0 14px rgba(238,34,14,0.55)',
               borderRadius: 2,
+              position: 'relative', zIndex: 54,
             }} />
 
             <p style={{
               fontFamily: "'Rajdhani', sans-serif", fontSize: 15, fontWeight: 500,
               letterSpacing: '0.04em', color: 'rgba(255,200,200,0.38)', marginTop: 14,
+              position: 'relative', zIndex: 54,
             }}>
               Everything you need to know before showing up
             </p>
@@ -179,41 +191,46 @@ export default function FAQs() {
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '48px 64px',
             alignItems: 'start',
+            position: 'relative', zIndex: 52,
           }}>
 
             {/* Left panel */}
-            <div style={{ position: 'sticky', top: 100 }}>
+            <div style={{ position: 'sticky', top: 100, zIndex: 53 }}>
               <div style={{
                 background: 'rgba(10,0,0,0.88)',
                 border: '1px solid rgba(255,26,26,0.20)',
                 borderRadius: 16, padding: '28px 24px',
                 boxShadow: '0 0 40px rgba(180,0,0,0.10)',
                 position: 'relative', overflow: 'hidden',
+                zIndex: 53,
               }}>
-                {/* Top accent — red primary, violet only at far right edge */}
+                {/* Top accent */}
                 <div style={{
                   position: 'absolute', top: 0, left: 0, right: 0, height: 2,
                   background: 'linear-gradient(90deg, transparent, rgba(238,34,14,0.85), #fff, rgba(238,34,14,0.80), rgba(110,30,160,0.22), transparent)',
                   boxShadow: '0 0 14px rgba(238,34,14,0.60)',
+                  zIndex: 54,
                 }} />
 
-                {/* Violet used only as a very faint bottom-right corner orb */}
+                {/* Violet corner orb */}
                 <div style={{
                   position: 'absolute', bottom: -30, right: -30,
                   width: 90, height: 90, borderRadius: '50%',
                   background: 'radial-gradient(circle, rgba(100,30,160,0.10) 0%, transparent 70%)',
                   pointerEvents: 'none',
+                  zIndex: 53,
                 }} />
 
                 <MessageSquare
                   size={26} color="#ff4040"
-                  style={{ marginBottom: 14, filter: 'drop-shadow(0 0 6px rgba(238,34,14,0.55))' }}
+                  style={{ marginBottom: 14, filter: 'drop-shadow(0 0 6px rgba(238,34,14,0.55))', position: 'relative', zIndex: 54 }}
                 />
 
                 <h3 style={{
                   fontFamily: "'Orbitron', monospace", fontSize: 18, fontWeight: 700,
                   letterSpacing: '0.08em', color: '#fff',
                   textShadow: '0 0 18px rgba(238,34,14,0.45)', margin: '0 0 10px',
+                  position: 'relative', zIndex: 54,
                 }}>
                   GOT MORE<br />QUESTIONS?
                 </h3>
@@ -221,6 +238,7 @@ export default function FAQs() {
                 <p style={{
                   fontFamily: "'Rajdhani', sans-serif", fontSize: 14, fontWeight: 500,
                   lineHeight: 1.65, color: 'rgba(255,200,200,0.38)', margin: '0 0 22px',
+                  position: 'relative', zIndex: 54,
                 }}>
                   Can&apos;t find what you&apos;re looking for? Our team is standing by.
                 </p>
@@ -233,6 +251,7 @@ export default function FAQs() {
                   <div key={s.label} className="faq-stat-divider" style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     padding: '9px 0',
+                    position: 'relative', zIndex: 54,
                   }}>
                     <span style={{
                       fontFamily: "'Orbitron', monospace", fontSize: 17, fontWeight: 900,
@@ -245,10 +264,10 @@ export default function FAQs() {
                   </div>
                 ))}
 
-                {/* Red button — same as original */}
+                {/* Contact button */}
                 <Link
                   href="mailto:metallixju2026@gmail.com"
-                  style={{ textDecoration: 'none', display: 'block', marginTop: 24 }}
+                  style={{ textDecoration: 'none', display: 'block', marginTop: 24, position: 'relative', zIndex: 55 }}
                 >
                   <div style={{
                     width: '100%', padding: '11px 0', borderRadius: 9,
@@ -268,13 +287,12 @@ export default function FAQs() {
             </div>
 
             {/* Right panel — Accordion */}
-            <div style={{ minWidth: 0 }}>
+            <div style={{ minWidth: 0, position: 'relative', zIndex: 53 }}>
               <Accordion type="single" collapsible>
                 {faqItems.map((item, index) => (
                   <AccordionItem key={item.id} value={item.id} className="faq-accordion-item">
                     <AccordionTrigger className="faq-trigger hover:no-underline">
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        {/* Number label: red, violet only on hover via CSS */}
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 12, position: 'relative', zIndex: 54 }}>
                         <span style={{
                           fontFamily: "'Orbitron', monospace",
                           fontSize: 9, fontWeight: 700,
