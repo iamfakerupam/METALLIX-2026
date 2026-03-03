@@ -301,6 +301,7 @@ export const FooterBg = () => (
       zIndex: 51,
       background:
         "radial-gradient(120% 120% at 50% 0%, rgba(15,0,0,0.85) 40%, rgba(80,10,140,0.25) 100%)",
+      pointerEvents: "none", // ← ensure bg never captures pointer events
     }}
   />
 );
@@ -367,7 +368,7 @@ function SocialBtn({
         textDecoration: "none",
         transition: "border 0.20s ease, background 0.20s ease, color 0.20s ease, box-shadow 0.20s ease",
         position: "relative",
-        zIndex: 55,
+        zIndex: 65, // ← raised above all footer overlay layers
       }}
     >
       {icon}
@@ -398,6 +399,8 @@ function EventLink({ label, href }: { label: string; href: string }) {
         padding: "4px 0",
         display: "block",
         transition: "color 0.20s ease",
+        position: "relative",
+        zIndex: 65, // ← raised above all footer overlay layers
       }}
     >
       {label}
@@ -423,6 +426,8 @@ function ContactLink({ children, href }: { children: React.ReactNode; href: stri
         cursor: "pointer",
         textDecoration: "none",
         display: "block",
+        position: "relative",
+        zIndex: 65, // ← raised above all footer overlay layers
       }}
     >
       {children}
@@ -504,9 +509,10 @@ function MetallixFooter() {
           background: "linear-gradient(90deg, transparent, rgba(220,30,10,0.8) 30%, #fff 50%, rgba(140,20,200,0.6) 70%, transparent)",
           boxShadow: "0 0 18px rgba(220,30,10,0.5)",
           zIndex: 60,
+          pointerEvents: "none",
         }} />
 
-        {/* Scanline */}
+        {/* Scanline — pointerEvents none so it never blocks clicks */}
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none", zIndex: 51,
           backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
@@ -517,7 +523,7 @@ function MetallixFooter() {
         <div
           className="ft-outer-pad"
           style={{
-            position: "relative", zIndex: 56,
+            position: "relative", zIndex: 62, // ← raised: content grid sits above all decorative overlays
             maxWidth: 1200, margin: "0 auto",
             padding: "56px 48px 0",
           }}
@@ -532,7 +538,7 @@ function MetallixFooter() {
               paddingBottom: 48,
               alignItems: "start",
               position: "relative",
-              zIndex: 57,
+              zIndex: 63,
             }}
           >
             {/* COL 1: Brand */}
@@ -580,7 +586,14 @@ function MetallixFooter() {
                 Material Engineering, Jadavpur University.
               </p>
 
-              <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+              {/* Social buttons row — isolated stacking context at z:65 */}
+              <div style={{
+                display: "flex",
+                gap: 10,
+                marginTop: 4,
+                position: "relative",
+                zIndex: 65,
+              }}>
                 {socialLinks.map((s) => (
                   <SocialBtn key={s.label} icon={s.icon} label={s.label} href={s.href} />
                 ))}
@@ -652,7 +665,7 @@ function MetallixFooter() {
             background: "linear-gradient(90deg, transparent, rgba(220,30,10,0.4) 30%, rgba(140,20,200,0.22) 70%, transparent)",
             boxShadow: "0 0 6px rgba(140,20,200,0.08)",
             position: "relative",
-            zIndex: 57,
+            zIndex: 63,
           }} />
 
           {/* Bottom bar */}
@@ -666,7 +679,7 @@ function MetallixFooter() {
               padding: "18px 0 20px",
               gap: 12,
               position: "relative",
-              zIndex: 57,
+              zIndex: 63,
             }}
           >
             <p style={{
@@ -680,17 +693,19 @@ function MetallixFooter() {
           </div>
 
           {/* Large hover text — desktop only */}
+          {/* pointerEvents on the wrapper is "none" so it NEVER blocks the content above */}
           <div
             className="lg:flex hidden"
             style={{
               height: "28rem",
               marginTop: "-10rem",
               marginBottom: "-8rem",
-              pointerEvents: "none",
+              pointerEvents: "none", // ← critical: decorative layer must not eat pointer events
               zIndex: 58,
               position: "relative",
             }}
           >
+            {/* Inner div gets pointerEvents back only for the SVG interaction */}
             <div style={{ width: "100%", height: "100%", pointerEvents: "auto" }}>
               <TextHoverEffect text="METALLIX" className="z-50" />
             </div>
