@@ -7,7 +7,7 @@ import { Zap, Trophy, Star, Users, Calendar } from "lucide-react"
 /* ── Typewriter ── */
 const TW_LINES = [
   "Where Metallurgy Meets Innovation.",
-  "Two Days. Eight Events. One Stage.",
+  "Two Days. Nine Events. One Stage.",
   "JU's Premier Technical Fest.",
   "Compete. Create. Conquer.",
 ]

@@ -39,6 +39,14 @@ const CONTACTS = [
   },
   {
     id: '04',
+    name: 'Madanmohan Rana',
+    position: 'Joint Treasurer',
+    gmail: 'madanmohanrana2003@gmail.com',
+    phone: '+91 8670493369',
+    image: '/madanmohan.jpeg',
+  },
+  {
+    id: '05',
     name: 'Swarnendu Saha',
     position: 'Assistant Secretary',
     gmail: 'sahaswarnendu439@gmail.com',
@@ -46,13 +54,22 @@ const CONTACTS = [
     image: '/swarnendu.jpeg',
   },
   {
-    id: '05',
+    id: '06',
     name: 'Bapan Saha',
     position: 'Assistant Treasurer',
     gmail: 'bapansahaindian@gmail.com',
     phone: '+91 7439686232',
-    image: '/bapan.jpeg',
+    image: '/djabapan.jpeg',
   },
+   {
+    id: '07',
+    name: 'Rupam Basak',
+    position: 'Tech Lead',
+    gmail: 'rupambasak01@gmail.com',
+    phone: '+91 9134930115',
+    image: '/rupam.jpeg',
+  },
+ 
 ]
 /* ================================================================ */
 

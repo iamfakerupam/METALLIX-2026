@@ -448,6 +448,7 @@ function MetallixFooter() {
     { label: "Talaash",     href: "/events/talaash" },
     { label: "Gnosis",      href: "/events/gnosis" },
     { label: "Wall Street", href: "/events/wallst" },
+    { label: "Golazo",      href: "/events/golazo" },
   ];
 
   const eventsCol1 = eventLinks.slice(0, 4);
@@ -463,8 +464,8 @@ function MetallixFooter() {
     {
       icon: <Mail size={16} />,
       label: "Email",
-      lines: ["metallixju2026@gmail.com"],
-      href: "mailto:metallixju2026@gmail.com",
+      lines: ["official.metallixju@gmail.com"],
+      href: "mailto:official.metallixju@gmail.com",
     },
     {
       icon: <MapPin size={16} />,
@@ -478,7 +479,7 @@ function MetallixFooter() {
     {
       icon: <Phone size={16} />,
       label: "Phone",
-      lines: ["+91 XXXXX XXXXX", "+91 XXXXX XXXXX"],
+      lines: ["+91 89729 77686", "+91 75859 78804"],
       href: null,
     },
   ];

@@ -715,7 +715,7 @@ export const HeroVideoDemo = () => {
             width: "100%",
           }}
         >
-          <CTABtn href="/comingsoon" primary>
+          <CTABtn href="https://unstop.com/college-fests/metallix-ju-jadavpur-university-ju-kolkata-445518" primary>
             <Zap size={13} />
             Register Free
           </CTABtn>

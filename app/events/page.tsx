@@ -18,7 +18,7 @@ const events = [
 
 export default function Event() {
   return (
-    <SmoothScrollWrapper>
+    <>
       <div
         className="relative min-h-screen overflow-x-hidden bg-black"
         style={{ background: 'linear-gradient(160deg, #0a0015 0%, #050008 40%, #0d0000 100%)' }}
@@ -165,11 +165,11 @@ export default function Event() {
               className="uppercase tracking-[0.22em]"
               style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 9, fontWeight: 600, color: 'rgba(120,8,185,0.28)' }}
             >
-              · More events coming soon ·
+             
             </p>
           </footer>
         </main>
       </div>
-    </SmoothScrollWrapper>
+    </>
   )
 }

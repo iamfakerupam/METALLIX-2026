@@ -244,7 +244,7 @@ export default function FAQs() {
                 </p>
 
                 {[
-                  { num: '8',    label: 'Unique Events' },
+                  { num: '9',    label: 'Unique Events' },
                   { num: '₹1L',  label: 'Prize Pool' },
                   { num: 'FREE', label: 'Registration' },
                 ].map((s) => (
@@ -266,7 +266,7 @@ export default function FAQs() {
 
                 {/* Contact button */}
                 <Link
-                  href="mailto:metallixju2026@gmail.com"
+                  href="mailto:official.metallixju@gmail.com"
                   style={{ textDecoration: 'none', display: 'block', marginTop: 24, position: 'relative', zIndex: 55 }}
                 >
                   <div style={{
