@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { motion } from 'framer-motion'
 import type { Variants } from "framer-motion"
 import type { HTMLMotionProps } from "framer-motion"
+import Link from 'next/link'
 
 /* ── Font injection ── */
 let fontsInjected = false
@@ -165,6 +166,7 @@ export interface EventDescriptionHeroProps extends HTMLMotionProps<"section"> {
   location: string
   date: string
   time: string
+  link: string
 }
 
 /* ── Animation variants ── */
@@ -188,7 +190,7 @@ const itemVariants = {
 /* ── Main component ── */
 export const EventDescriptionHero = React.forwardRef<HTMLDivElement, EventDescriptionHeroProps>(
   (
-    { className, image, title, description, contactName, contactNumber, location, date, time, ...props },
+    { className, image, title, description, contactName, contactNumber, location, date, time, link, ...props },
     ref
   ) => {
     useEffect(() => {
@@ -303,6 +305,7 @@ export const EventDescriptionHero = React.forwardRef<HTMLDivElement, EventDescri
             {/* Footer: CTA + contact number */}
             <motion.footer variants={itemVariants} style={{ marginTop: 48 }}>
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 20 }}>
+                <Link href={link}>
                 <button
                   className="edh-cta"
                   style={{
@@ -331,8 +334,9 @@ export const EventDescriptionHero = React.forwardRef<HTMLDivElement, EventDescri
                     pointerEvents: 'none',
                   }} />
                   <ZapIcon />
-                  Link Available Soon
+                  Register Now
                 </button>
+                </Link>
 
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 8,

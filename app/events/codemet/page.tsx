@@ -5,6 +5,7 @@ const page = () => {
   return (
     <div>
         <EventDescriptionHero
+        link='https://unstop.com/o/85xiPwr?lb=sQS6zWRA&utm_medium=Share&utm_source=competitions&utm_campaign=Swarnsah29289'
   image="/codemet.png"
   title="CODEMET"
   description="A premier competitive coding event where the brightest minds battle through algorithmic challenges. Test your logic, speed, and creativity across multiple rounds of intense problem-solving."
