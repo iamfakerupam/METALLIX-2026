@@ -61,14 +61,7 @@ const CONTACTS = [
     phone: '+91 7439686232',
     image: '/djabapan.jpeg',
   },
-   {
-    id: '07',
-    name: 'Rupam Basak',
-    position: 'Tech Lead',
-    gmail: 'rupambasak01@gmail.com',
-    phone: '+91 9134930115',
-    image: '/rupam.jpeg',
-  },
+
  
 ]
 /* ================================================================ */
