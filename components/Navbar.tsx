@@ -7,7 +7,7 @@ import { Menu, X } from "lucide-react";
 const NAV_LINKS = [
   { label: "Home",     href: "home" },
   { label: "About",    href: "about" },
-  { label: "Schedule",   href: "events" },
+  { label: "Schedule", href: "events" },
   { label: "Team",     href: "contact" },
   { label: "Sponsors", href: "sponsors" },
   { label: "FAQ",      href: "faq" },
@@ -128,9 +128,10 @@ export default function Navbar() {
   const [atTop, setAtTop]           = useState(true);
   const prevScrollY                 = useRef(0);
 
+  // ✅ Native scroll listener — replaces the broken "navscroll" custom event
   useEffect(() => {
-    const handler = (e: Event) => {
-      const cur = (e as CustomEvent<{ scrollY: number }>).detail.scrollY;
+    const handler = () => {
+      const cur = window.scrollY;
       const prev = prevScrollY.current;
 
       setAtTop(cur < 10);
@@ -147,8 +148,8 @@ export default function Navbar() {
       prevScrollY.current = cur;
     };
 
-    window.addEventListener("navscroll", handler);
-    return () => window.removeEventListener("navscroll", handler);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
   }, []);
 
   useEffect(() => {

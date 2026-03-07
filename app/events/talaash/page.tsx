@@ -13,7 +13,7 @@ const page = () => {
   contactNumber="+91 7439686232"
   location="Revealed Soon"
   date="April 3, 2026"
-  time="Revealed Soon"
+  time="3:30 PM Onwards"
 />
     </div>
   )

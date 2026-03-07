@@ -547,27 +547,25 @@ function TimelineDemo() {
   const t  = (date: string, h: number, m = 0) =>
     new Date(`${date}T${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:00`).toISOString();
 
-  const items: TimelineItem[] = [
-    { id:"1",  title:"Inauguration Ceremony",  startTime:t(D1,10),    endTime:t(D1,11),    venue:"Dr. Triguna Sen Auditorium", tag:"Opening",  description:"Official inauguration of Metallix 2026." },
-    { id:"2",  title:"Conveynor Speech",        startTime:t(D1,11),    endTime:t(D1,12),    venue:"Dr. Triguna Sen Auditorium", tag:"Seminar"  },
-    { id:"3",  title:"Faculty Advisory Speech", startTime:t(D1,12),    endTime:t(D1,12,30), venue:"Dr. Triguna Sen Auditorium", tag:"Seminar"  },
-    { id:"4",  title:"VC, Pro VC, Dean",        startTime:t(D1,12,30), endTime:t(D1,13,30), venue:"Dr. Triguna Sen Auditorium", tag:"Seminar"  },
-    { id:"5",  title:"Technical Session 1",     startTime:t(D1,13,30), endTime:t(D1,14,30), venue:"Dr. Triguna Sen Auditorium", tag:"Seminar"  },
-    { id:"6",  title:"Lunch",                   startTime:t(D1,14,30), endTime:t(D1,15,30), venue:"JU Guest House",             tag:"Break"    },
-    { id:"7",  title:"Technical Session 2",     startTime:t(D1,15,30), endTime:t(D1,18),    venue:"Dr. Triguna Sen Auditorium", tag:"Seminar"  },
-    { id:"8",  title:"CODEMET",                 startTime:t(D1,18,30), endTime:t(D1,20),    venue:"MetE Dept.",                 tag:"Event"    },
-    { id:"9",  title:"HACKMET",                 startTime:t(D1,20),    endTime:t(D1,22),    venue:"MetE Dept.",                 tag:"Event"    },
-    { id:"10", title:"Golazo",                  startTime:t(D2,10),    endTime:t(D2,11),    venue:"MetE Dept.",                 tag:"Event"    },
-    { id:"11", title:"Wall Street",             startTime:t(D2,11),    endTime:t(D2,12),    venue:"K.P Basu Memorial Hall",     tag:"Event"    },
-    { id:"12", title:"Specio",                  startTime:t(D2,12),    endTime:t(D2,12,30), venue:"K.P Basu Memorial Hall",     tag:"Event"    },
-    { id:"13", title:"Scribe",                  startTime:t(D2,12,30), endTime:t(D2,13),    venue:"K.P Basu Memorial Hall",     tag:"Event"    },
-    { id:"14", title:"Scroll",                  startTime:t(D2,13),    endTime:t(D2,13,30), venue:"K.P Basu Memorial Hall",     tag:"Event"    },
-    { id:"15", title:"Talaash",                 startTime:t(D2,13,30), endTime:t(D2,14,30), venue:"K.P Basu Memorial Hall",     tag:"Event"    },
-    { id:"16", title:"Lunch",                   startTime:t(D2,14,30), endTime:t(D2,15,30), venue:"JU Guest House",             tag:"Break"    },
-    { id:"17", title:"Gnosis",                  startTime:t(D2,15,30), endTime:t(D2,17),    venue:"K.P Basu Memorial Hall",     tag:"Event"    },
-    { id:"18", title:"Closing Ceremony",        startTime:t(D2,17),    endTime:t(D2,18),    venue:"K.P Basu Memorial Hall",     tag:"Event"    },
-  ];
-
+const items: TimelineItem[] = [
+    { id:"1",  title:"Inauguration Ceremony",  startTime:t(D1,10,15),    endTime:t(D1,11,15),    venue:"Dr. Triguna Sen Auditorium", tag:"Opening",      description:"Official inauguration of Metallix 2026." },
+    { id:"2",  title:"Keynote Address",        startTime:t(D1,11,15),    endTime:t(D1,12),        venue:"Dr. Triguna Sen Auditorium", tag:"Seminar"   },
+    { id:"3",  title:"Tea Break",              startTime:t(D1,12),        endTime:t(D1,12,20),     venue:"Dr. Triguna Sen Auditorium", tag:"Break"     },
+    { id:"4",  title:"Technical Session 1",    startTime:t(D1,12,20),     endTime:t(D1,13,30),     venue:"Dr. Triguna Sen Auditorium", tag:"Seminar"   },
+    { id:"5",  title:"Lunch",                  startTime:t(D1,13,30),     endTime:t(D1,14,30),     venue:"JU Guest House", tag:"Break"     },
+    { id:"6",  title:"Technical Session 2",    startTime:t(D1,14,30),     endTime:t(D1,15,40),     venue:"Dr. Triguna Sen Auditorium",             tag:"Seminar"   },
+    { id:"7",  title:"Valedictory Session",    startTime:t(D1,15,40),     endTime:t(D1,16),        venue:"Dr. Triguna Sen Auditorium", tag:"Closing"   },
+   
+    { id:"10", title:"Golazo",                 startTime:t(D2,10),        endTime:t(D2,10,30),     venue:"K.P Basu Memorial Hall",                 tag:"Event"     },
+    { id:"11", title:"Wall Street",            startTime:t(D2,10,30),     endTime:t(D2,11,15),     venue:"K.P Basu Memorial Hall",     tag:"Event"     },
+    { id:"12", title:"Specio",                 startTime:t(D2,11,15),     endTime:t(D2,11,45),     venue:"K.P Basu Memorial Hall",     tag:"Event"     },
+    { id:"13", title:"Scribe",                 startTime:t(D2,11,45),     endTime:t(D2,12,30),     venue:"K.P Basu Memorial Hall",     tag:"Event"     },
+    { id:"14", title:"Scroll",                 startTime:t(D2,12,30),     endTime:t(D2,13,0),      venue:"K.P Basu Memorial Hall",     tag:"Event"     },
+    { id:"15", title:"Lunch",                  startTime:t(D2,13,0),      endTime:t(D2,14,15),     venue:"JU Guest House",             tag:"Break"     },
+    { id:"16", title:"Gnosis",                 startTime:t(D2,14,15),     endTime:t(D2,15,15),     venue:"K.P Basu Memorial Hall",     tag:"Event"     },
+    { id:"17", title:"Talaash",                startTime:t(D2,15,30),     endTime:t(D2,18,0),      venue:"K.P Basu Memorial Hall",     tag:"Event"     },
+    { id:"18", title:"Closing Ceremony",       startTime:t(D2,20),        endTime:t(D2,20,30),     venue:"K.P Basu Memorial Hall",     tag:"Closing"   },
+];
   return <GlowingTimeline items={items} />;
 }
 

@@ -4,16 +4,26 @@ import { EventCountdownCard } from '@/components/event-countdown-card'
 import { SmoothCursor } from '@/components/ui/smooth-cursor'
 import React from 'react'
 
+const D1 = new Date(2026, 3, 1)  // April 1, 2026
+const D2 = new Date(2026, 3, 3)  // April 3, 2026
+
+const t = (base: Date, h: number, m = 0) => {
+  const d = new Date(base)
+  d.setHours(h, m, 0, 0)
+  return d
+}
+
+// ✅ Also at module level — stable references, no re-creation on render
 const events = [
-  { href: '/events/codemet',  image: '/codemet.png',  title: 'CODEMET'  },
-  { href: '/events/hackmet',  image: '/hackemet.png', title: 'HACKMET'  },
-  { href: '/events/scribe',   image: '/scribe.png',   title: 'SCRIBE'   },
-  { href: '/events/specio',   image: '/specio.png',   title: 'SPECIO'   },
-  { href: '/events/scroll',   image: '/scroll.png',   title: 'SCROLL'   },
-  { href: '/events/talaash',  image: '/talaash.png',  title: 'TALAASH'  },
-  { href: '/events/gnosis',   image: '/gnosis.png',   title: 'GNOSIS'   },
-  { href: '/events/wallst',   image: '/wallst.png',   title: 'WALLST'   },
-  { href: '/events/golazo',   image: '/golazo.png',   title: 'GOLAZO'   },
+  { href: '/events/codemet',  image: '/codemet.png',  title: 'CODEMET',  date: t(D1, 10,  0) },
+  { href: '/events/hackmet',  image: '/hackemet.png', title: 'HACKMET',  date: t(D1, 10,  0) },
+  { href: '/events/scribe',   image: '/scribe.png',   title: 'SCRIBE',   date: t(D2, 11, 45) },
+  { href: '/events/specio',   image: '/specio.png',   title: 'SPECIO',   date: t(D2, 11, 15) },
+  { href: '/events/scroll',   image: '/scroll.png',   title: 'SCROLL',   date: t(D2, 12, 30) },
+  { href: '/events/talaash',  image: '/talaash.png',  title: 'TALAASH',  date: t(D2, 15, 30) },
+  { href: '/events/gnosis',   image: '/gnosis.png',   title: 'GNOSIS',   date: t(D2, 14, 15) },
+  { href: '/events/wallst',   image: '/wallst.png',   title: 'WALLST',   date: t(D2, 10, 30) },
+  { href: '/events/golazo',   image: '/golazo.png',   title: 'GOLAZO',   date: t(D2, 10,  0) },
 ]
 
 export default function Event() {
@@ -51,14 +61,12 @@ export default function Event() {
           .ev-card:nth-child(8) { animation-delay: 0.31s }
           .ev-card:nth-child(9) { animation-delay: 0.35s }
 
-          /* Hovering the card wrapper lights up the button */
           .ev-link:hover .ecc-btn {
             background-image: linear-gradient(135deg, #b01200, #ee220e) !important;
             box-shadow: 0 0 18px rgba(238,34,14,0.6) !important;
             border-color: rgba(238,34,14,0.55) !important;
           }
 
-          /* Single GPU layer for ticker */
           .ev-ticker {
             display: flex;
             white-space: nowrap;
@@ -67,7 +75,7 @@ export default function Event() {
           }
         `}</style>
 
-        {/* Top neon line — static, no animation, no blur */}
+        {/* Top neon line */}
         <div
           className="fixed top-0 inset-x-0 h-[2px] z-50 pointer-events-none"
           style={{
@@ -76,7 +84,7 @@ export default function Event() {
           }}
         />
 
-        {/* Ticker — one composited layer, no backdrop-filter */}
+        {/* Ticker */}
         <div
           className="fixed top-[2px] inset-x-0 h-5 z-40 overflow-hidden pointer-events-none"
           style={{ background: '#050008', borderBottom: '1px solid rgba(120,8,185,0.10)' }}
@@ -98,7 +106,6 @@ export default function Event() {
 
           {/* Header */}
           <header className="text-center pt-8 sm:pt-12 pb-10 sm:pb-14">
-
             <p
               className="uppercase tracking-[0.24em] mb-4"
               style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 10, fontWeight: 700, color: 'rgba(140,10,185,0.55)' }}
@@ -126,7 +133,6 @@ export default function Event() {
               Forge your legacy — select your arena
             </p>
 
-            {/* Rule — static, zero animation */}
             <div className="flex items-center justify-center gap-3 mt-5 opacity-60">
               <div className="h-px w-10 sm:w-20" style={{ background: 'rgba(120,8,185,0.5)' }} />
               <div className="w-1 h-1 rounded-full" style={{ background: 'rgba(220,30,10,0.9)', boxShadow: '0 0 5px rgba(220,30,10,0.7)' }} />
@@ -154,6 +160,7 @@ export default function Event() {
                 <EventCountdownCard
                   image={ev.image}
                   title={ev.title}
+                  date={ev.date}        
                   attendees={0}
                 />
               </a>
@@ -166,7 +173,6 @@ export default function Event() {
               className="uppercase tracking-[0.22em]"
               style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 9, fontWeight: 600, color: 'rgba(120,8,185,0.28)' }}
             >
-             
             </p>
           </footer>
         </main>

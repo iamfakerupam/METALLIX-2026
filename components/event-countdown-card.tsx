@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback, memo } from "react"
+import { useEffect, useState, useCallback, memo, useRef } from "react"
 import { Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -301,20 +301,23 @@ export function EventCountdownCard({
 }: EventCountdownCardProps) {
   const ac = ACCENTS[accentColor]
 
-  const [eventDate] = useState<Date>(() => date ?? makeDefaultDate())
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
+
+  // ✅ Stable ref — updated whenever date prop changes
+  const targetMs = useRef<number>((date ?? makeDefaultDate()).getTime())
 
   useEffect(() => {
     injectFonts()
     injectStyles()
-    const target = date ?? eventDate
+    // Update the target whenever the date prop changes
+    targetMs.current = (date ?? makeDefaultDate()).getTime()
+
     const tick = () =>
-      setTimeLeft(Math.max(0, Math.floor((+target - Date.now()) / 1000)))
+      setTimeLeft(Math.max(0, Math.floor((targetMs.current - Date.now()) / 1000)))
     tick()
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date])
+  }, [date]) // ✅ re-runs when date prop changes
 
   const toUnits = useCallback(
     (s: number) => ({
@@ -326,7 +329,8 @@ export function EventCountdownCard({
     []
   )
 
-  const displayDate = date ?? eventDate
+  // ✅ displayDate derived directly from prop, no stale state
+  const displayDate = date ?? makeDefaultDate()
   const live = timeLeft !== null && timeLeft <= 0
   const soon = timeLeft !== null && timeLeft > 0 && timeLeft < 86400
   const u = timeLeft !== null && timeLeft > 0 ? toUnits(timeLeft) : null
@@ -335,11 +339,9 @@ export function EventCountdownCard({
     <div
       className={cn("ecc-root", className)}
       style={{
-        /* ── Fixed card size: every card is identical ── */
         width: 340,
         height: 520,
         flexShrink: 0,
-
         position: "relative",
         borderRadius: 20,
         backgroundColor: "#020000",
@@ -351,8 +353,6 @@ export function EventCountdownCard({
         fontFamily: "'Rajdhani',sans-serif",
         overflow: "hidden",
         cursor: "pointer",
-
-        /* Flex column so body fills the remaining height */
         display: "flex",
         flexDirection: "column",
       }}
@@ -399,7 +399,7 @@ export function EventCountdownCard({
         }}
       />
 
-      {/* ── Image area: fixed height, blurred bg fills gaps ── */}
+      {/* ── Image area ── */}
       <div
         style={{
           position: "relative",
@@ -408,7 +408,6 @@ export function EventCountdownCard({
           overflow: "hidden",
         }}
       >
-        {/* Blurred background: same image stretched to fill dead space */}
         <div
           style={{
             position: "absolute",
@@ -417,12 +416,11 @@ export function EventCountdownCard({
             backgroundSize: "cover",
             backgroundPosition: "center",
             filter: "blur(20px) brightness(0.30) saturate(1.6)",
-            transform: "scale(1.2)", // prevents blur-edge artifact
+            transform: "scale(1.2)",
             zIndex: 0,
           }}
         />
 
-        {/* Foreground: image fully visible via contain */}
         <img
           src={image}
           alt={title}
@@ -440,7 +438,6 @@ export function EventCountdownCard({
           }}
         />
 
-        {/* Bottom fade overlay */}
         <div
           style={{
             position: "absolute",
@@ -452,7 +449,6 @@ export function EventCountdownCard({
           }}
         />
 
-        {/* Left accent bar */}
         <div
           style={{
             position: "absolute",
@@ -490,7 +486,7 @@ export function EventCountdownCard({
         )}
       </div>
 
-      {/* ── Body: grows to fill, CTA pinned to bottom ── */}
+      {/* ── Body ── */}
       <div
         style={{
           flex: 1,
@@ -499,10 +495,9 @@ export function EventCountdownCard({
           flexDirection: "column",
           position: "relative",
           zIndex: 1,
-          minHeight: 0, // important for flex overflow behaviour
+          minHeight: 0,
         }}
       >
-        {/* Title — clamped to 2 lines so all cards align consistently */}
         <h3
           style={{
             fontFamily: "'Orbitron',monospace",
@@ -559,7 +554,7 @@ export function EventCountdownCard({
           )}
         </div>
 
-        {/* Countdown / Live — vertically centered in remaining space */}
+        {/* Countdown / Live */}
         <div
           style={{
             flex: 1,
@@ -612,10 +607,10 @@ export function EventCountdownCard({
               >
                 {u ? (
                   <>
-                    <Tile label="DAYS" value={String(u.days).padStart(2, "0")} ac={ac} isSec={false} />
-                    <Tile label="HRS"  value={String(u.hours).padStart(2, "0")} ac={ac} isSec={false} />
+                    <Tile label="DAYS" value={String(u.days).padStart(2, "0")}    ac={ac} isSec={false} />
+                    <Tile label="HRS"  value={String(u.hours).padStart(2, "0")}   ac={ac} isSec={false} />
                     <Tile label="MIN"  value={String(u.minutes).padStart(2, "0")} ac={ac} isSec={false} />
-                    <Tile label="SEC"  value={String(u.seconds).padStart(2, "0")} ac={ac} isSec={true} />
+                    <Tile label="SEC"  value={String(u.seconds).padStart(2, "0")} ac={ac} isSec={true}  />
                   </>
                 ) : (
                   ["DAYS", "HRS", "MIN", "SEC"].map((l) => (
@@ -627,7 +622,7 @@ export function EventCountdownCard({
           )}
         </div>
 
-        {/* CTA always at the bottom */}
+        {/* CTA */}
         <div style={{ marginTop: 16, flexShrink: 0 }}>
           <CTA
             label={live ? "Join Now" : "Reserve Your Spot"}
