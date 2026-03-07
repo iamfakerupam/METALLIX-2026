@@ -1,6 +1,6 @@
 "use client"
 
-import { FC, useEffect, useRef } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import { motion, useSpring } from "motion/react"
 
 interface Position {
@@ -89,6 +89,7 @@ export function SmoothCursor({
     restDelta: 0.001,
   },
 }: SmoothCursorProps) {
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
   const lastMousePos = useRef<Position>({ x: 0, y: 0 })
   const velocity = useRef<Position>({ x: 0, y: 0 })
   const lastUpdateTime = useRef(Date.now())
@@ -109,6 +110,14 @@ export function SmoothCursor({
   })
 
   useEffect(() => {
+    const isTouch =
+      "ontouchstart" in window ||
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia("(pointer: coarse)").matches
+
+    setIsTouchDevice(isTouch)
+    if (isTouch) return
+
     let timeout: ReturnType<typeof setTimeout> | null = null
 
     const updateVelocity = (currentPos: Position) => {
@@ -184,6 +193,8 @@ export function SmoothCursor({
     }
   }, [cursorX, cursorY, rotation, scale])
 
+  if (isTouchDevice) return null
+
   return (
     <motion.div
       style={{
@@ -194,7 +205,7 @@ export function SmoothCursor({
         translateY: "-50%",
         rotate: rotation,
         scale: scale,
-        zIndex: 1000,
+        zIndex: 10000,
         pointerEvents: "none",
         willChange: "transform",
       }}
