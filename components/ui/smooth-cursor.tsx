@@ -89,12 +89,24 @@ export function SmoothCursor({
     restDelta: 0.001,
   },
 }: SmoothCursorProps) {
-  const [isTouchDevice, setIsTouchDevice] = useState(false)
+  // ✅ Use a single state check for touch — never re-renders after mount
+  const [isTouchDevice] = useState(() => {
+    if (typeof window === "undefined") return false
+    return (
+      "ontouchstart" in window ||
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia("(pointer: coarse)").matches
+    )
+  })
+
   const lastMousePos = useRef<Position>({ x: 0, y: 0 })
   const velocity = useRef<Position>({ x: 0, y: 0 })
   const lastUpdateTime = useRef(Date.now())
   const previousAngle = useRef(0)
   const accumulatedRotation = useRef(0)
+  // ✅ Track RAF id in a ref so the handler closure is always fresh
+  const rafId = useRef<number>(0)
+  const scaleTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const cursorX = useSpring(0, springConfig)
   const cursorY = useSpring(0, springConfig)
@@ -110,88 +122,67 @@ export function SmoothCursor({
   })
 
   useEffect(() => {
-    const isTouch =
-      "ontouchstart" in window ||
-      navigator.maxTouchPoints > 0 ||
-      window.matchMedia("(pointer: coarse)").matches
+    if (isTouchDevice) return
 
-    setIsTouchDevice(isTouch)
-    if (isTouch) return
+    const handleMouseMove = (e: MouseEvent) => {
+      // ✅ Cancel any pending frame before scheduling a new one
+      if (rafId.current) cancelAnimationFrame(rafId.current)
 
-    let timeout: ReturnType<typeof setTimeout> | null = null
+      rafId.current = requestAnimationFrame(() => {
+        rafId.current = 0
+        const currentPos = { x: e.clientX, y: e.clientY }
+        const currentTime = Date.now()
+        const deltaTime = currentTime - lastUpdateTime.current
 
-    const updateVelocity = (currentPos: Position) => {
-      const currentTime = Date.now()
-      const deltaTime = currentTime - lastUpdateTime.current
-
-      if (deltaTime > 0) {
-        velocity.current = {
-          x: (currentPos.x - lastMousePos.current.x) / deltaTime,
-          y: (currentPos.y - lastMousePos.current.y) / deltaTime,
-        }
-      }
-
-      lastUpdateTime.current = currentTime
-      lastMousePos.current = currentPos
-    }
-
-    const smoothMouseMove = (e: MouseEvent) => {
-      const currentPos = { x: e.clientX, y: e.clientY }
-      updateVelocity(currentPos)
-
-      const speed = Math.sqrt(
-        Math.pow(velocity.current.x, 2) + Math.pow(velocity.current.y, 2)
-      )
-
-      cursorX.set(currentPos.x)
-      cursorY.set(currentPos.y)
-
-      if (speed > 0.1) {
-        const currentAngle =
-          Math.atan2(velocity.current.y, velocity.current.x) * (180 / Math.PI) +
-          90
-
-        let angleDiff = currentAngle - previousAngle.current
-        if (angleDiff > 180) angleDiff -= 360
-        if (angleDiff < -180) angleDiff += 360
-        accumulatedRotation.current += angleDiff
-        rotation.set(accumulatedRotation.current)
-        previousAngle.current = currentAngle
-
-        scale.set(0.95)
-
-        if (timeout !== null) {
-          clearTimeout(timeout)
+        if (deltaTime > 0) {
+          velocity.current = {
+            x: (currentPos.x - lastMousePos.current.x) / deltaTime,
+            y: (currentPos.y - lastMousePos.current.y) / deltaTime,
+          }
         }
 
-        timeout = setTimeout(() => {
-          scale.set(1)
-        }, 150)
-      }
-    }
+        lastUpdateTime.current = currentTime
+        lastMousePos.current = currentPos
 
-    let rafId: number
-    const throttledMouseMove = (e: MouseEvent) => {
-      if (rafId) return
+        // ✅ Set spring values — framer-motion batches these internally
+        cursorX.set(currentPos.x)
+        cursorY.set(currentPos.y)
 
-      rafId = requestAnimationFrame(() => {
-        smoothMouseMove(e)
-        rafId = 0
+        const speed = Math.sqrt(
+          velocity.current.x ** 2 + velocity.current.y ** 2
+        )
+
+        if (speed > 0.1) {
+          const currentAngle =
+            Math.atan2(velocity.current.y, velocity.current.x) * (180 / Math.PI) + 90
+
+          let angleDiff = currentAngle - previousAngle.current
+          if (angleDiff > 180) angleDiff -= 360
+          if (angleDiff < -180) angleDiff += 360
+
+          accumulatedRotation.current += angleDiff
+          rotation.set(accumulatedRotation.current)
+          previousAngle.current = currentAngle
+
+          scale.set(0.95)
+
+          if (scaleTimeout.current) clearTimeout(scaleTimeout.current)
+          scaleTimeout.current = setTimeout(() => scale.set(1), 150)
+        }
       })
     }
 
     document.body.style.cursor = "none"
-    window.addEventListener("mousemove", throttledMouseMove)
+    // ✅ passive: true — never blocks scrolling or other listeners
+    window.addEventListener("mousemove", handleMouseMove, { passive: true })
 
     return () => {
-      window.removeEventListener("mousemove", throttledMouseMove)
+      window.removeEventListener("mousemove", handleMouseMove)
       document.body.style.cursor = "auto"
-      if (rafId) cancelAnimationFrame(rafId)
-      if (timeout !== null) {
-        clearTimeout(timeout)
-      }
+      if (rafId.current) cancelAnimationFrame(rafId.current)
+      if (scaleTimeout.current) clearTimeout(scaleTimeout.current)
     }
-  }, [cursorX, cursorY, rotation, scale])
+  }, [isTouchDevice, cursorX, cursorY, rotation, scale])
 
   if (isTouchDevice) return null
 
