@@ -7,17 +7,6 @@ import type { Variants } from "framer-motion"
 import type { HTMLMotionProps } from "framer-motion"
 import Link from 'next/link'
 
-/* ── Font injection ── */
-let fontsInjected = false
-function injectFonts() {
-  if (fontsInjected || typeof document === 'undefined') return
-  fontsInjected = true
-  const link = document.createElement('link')
-  link.rel = 'stylesheet'
-  link.href =
-    'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap'
-  document.head.appendChild(link)
-}
 
 /* ── CSS injection ── */
 const CSS = `
@@ -194,7 +183,7 @@ export const EventDescriptionHero = React.forwardRef<HTMLDivElement, EventDescri
     ref
   ) => {
     useEffect(() => {
-      injectFonts()
+     
       injectStyles()
     }, [])
 

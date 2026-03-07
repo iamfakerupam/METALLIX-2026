@@ -1,4 +1,5 @@
 "use client";
+export const runtime = 'edge'
 
 import { useEffect, useRef } from "react";
 import { ImageTrailDemo } from "./About";
@@ -48,7 +49,7 @@ function FireSprinkles() {
     };
 
     const pool: P[] = [];
-    const MAX = 180; // max simultaneous embers
+    const MAX = window.navigator.hardwareConcurrency > 4 ? 180 : 80 // max simultaneous embers
 
     const spawnEmber = () => {
       if (pool.length >= MAX) return;

@@ -4,17 +4,8 @@ import { useEffect, useState, useCallback, memo, useRef } from "react"
 import { Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-/* ── Fonts ── */
-let fontsInjected = false
-function injectFonts() {
-  if (fontsInjected || typeof document === "undefined") return
-  fontsInjected = true
-  const link = document.createElement("link")
-  link.rel = "stylesheet"
-  link.href =
-    "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap"
-  document.head.appendChild(link)
-}
+
+
 
 /* ── Styles (injected once) ── */
 const CSS = `
@@ -307,7 +298,7 @@ export function EventCountdownCard({
   const targetMs = useRef<number>((date ?? makeDefaultDate()).getTime())
 
   useEffect(() => {
-    injectFonts()
+   
     injectStyles()
     // Update the target whenever the date prop changes
     targetMs.current = (date ?? makeDefaultDate()).getTime()

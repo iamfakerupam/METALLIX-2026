@@ -3,17 +3,6 @@
 import { memo, useEffect, useRef, useCallback, CSSProperties, ReactNode } from "react"
 import { cn } from "@/lib/utils"
 
-let fontsInjected = false
-function injectFonts() {
-  if (fontsInjected || typeof document === "undefined") return
-  fontsInjected = true
-  const link = document.createElement("link")
-  link.rel = "stylesheet"
-  link.href =
-    "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap"
-  document.head.appendChild(link)
-}
-
 const CSS = `
 @keyframes sp-in {
   from { opacity:0; transform:translateY(20px) scale(0.97); }
@@ -42,7 +31,7 @@ const CSS = `
 
 .sp2-minor-wrap {
   will-change: transform;
-  transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
+  transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), border-color 0.25s, box-shadow 0.25s;
   animation: sp-minor-in 0.45s cubic-bezier(0.22,1,0.36,1) both;
 }
 .sp2-minor-wrap:hover { transform: translateY(-4px) scale(1.05); }
@@ -57,16 +46,25 @@ const CSS = `
 }
 .sp2-badge { animation: sp-badge-glow 2.5s ease-in-out infinite; }
 
-.sp2-minor-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+/* ✅ Flex layout for minor sponsors — centers nicely at any count */
+.sp2-minor-flex {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 12px;
 }
-@media (max-width: 600px) {
-  .sp2-minor-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+.sp2-minor-item {
+  flex: 0 0 auto;
+  width: 140px;
 }
+
+@media (max-width: 600px) {
+  .sp2-minor-item { width: 130px; }
+}
+
 @media (max-width: 360px) {
-  .sp2-minor-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .sp2-minor-item { width: 110px; }
 }
 `
 
@@ -80,7 +78,7 @@ function injectStyles() {
 }
 
 /* ═══════════════════════════════════════════
-   ELECTRIC BORDER (only used for title sponsor now)
+   ELECTRIC BORDER
 ═══════════════════════════════════════════ */
 function hexToRgba(hex: string, alpha = 1): string {
   if (!hex) return `rgba(0,0,0,${alpha})`
@@ -303,23 +301,19 @@ const TitleInner = memo(function TitleInner({
     <div
       className="sp2-title-wrap"
       style={{
-        position:"relative",
-        borderRadius:18,
+        position:"relative", borderRadius:18,
         backgroundColor:"#070000",
         backgroundImage:"linear-gradient(150deg,rgba(26,3,0,0.98) 0%,rgba(5,0,0,1) 100%)",
         padding:"clamp(20px,4vw,32px) clamp(18px,5vw,36px) clamp(18px,4vw,28px)",
         display:"flex", flexDirection:"column", alignItems:"center", gap:16,
-        overflow:"hidden",
-        cursor:"pointer",
+        overflow:"hidden", cursor:"pointer",
       }}
     >
-      {/* Top neon bar */}
       <div style={{
         position:"absolute", top:0, left:0, right:0, height:2,
         backgroundImage:`linear-gradient(90deg,transparent,${glow} 25%,#fff 50%,${glow} 75%,transparent)`,
         boxShadow:`0 0 14px ${glow}`,
       }} />
-      {/* Bloom */}
       <div style={{
         position:"absolute", top:-65, left:"50%", transform:"translateX(-50%)",
         width:260, height:150, borderRadius:"50%",
@@ -333,7 +327,6 @@ const TitleInner = memo(function TitleInner({
         pointerEvents:"none",
       }} />
 
-      {/* Badge */}
       <div className="sp2-badge" style={{
         fontFamily:"'Orbitron',monospace",
         fontSize:9, fontWeight:700, letterSpacing:"0.22em",
@@ -345,7 +338,6 @@ const TitleInner = memo(function TitleInner({
         ★ Title Sponsor
       </div>
 
-      {/* Logo — increased from maxWidth:200 height:80 → maxWidth:280 height:140 */}
       <div style={{
         width:"100%", maxWidth:280, height:140,
         display:"flex", alignItems:"center", justifyContent:"center", position:"relative",
@@ -363,14 +355,12 @@ const TitleInner = memo(function TitleInner({
         />
       </div>
 
-      {/* Scan divider */}
       <div className="sp2-scan" style={{
         width:"75%", height:1,
         backgroundImage:`linear-gradient(90deg,transparent,${glow},rgba(255,120,50,0.5),transparent)`,
         boxShadow:`0 0 6px ${glow}`,
       }} />
 
-      {/* Name */}
       <div style={{
         fontFamily:"'Orbitron',monospace",
         fontSize:"clamp(13px,3vw,17px)", fontWeight:900, letterSpacing:"0.06em",
@@ -394,7 +384,7 @@ const TitleInner = memo(function TitleInner({
 })
 
 /* ═══════════════════════════════════════════
-   MINOR CARD INNER — no electric border, larger image
+   MINOR CARD INNER
 ═══════════════════════════════════════════ */
 const MinorInner = memo(function MinorInner({ name, image }: { name:string; image:string }) {
   const glow = "rgba(190,24,6,0.72)"
@@ -410,19 +400,18 @@ const MinorInner = memo(function MinorInner({ name, image }: { name:string; imag
         border:"1px solid rgba(150,16,4,0.30)",
         padding:"20px 16px 16px",
         display:"flex", flexDirection:"column", alignItems:"center", gap:10,
-        overflow:"hidden", height:"100%", cursor:"pointer",
+        overflow:"hidden",
+        width:"100%",        // ✅ fills the flex item width
+        height:"100%",
+        cursor:"pointer",
         boxSizing:"border-box",
-        transition:"border-color 0.25s, box-shadow 0.25s",
-        boxShadow:"0 0 0 0 transparent",
       }}
     >
-      {/* Top neon bar */}
       <div style={{
         position:"absolute", top:0, left:0, right:0, height:1.5,
         backgroundImage:`linear-gradient(90deg,transparent,${glow},transparent)`,
         boxShadow:`0 0 7px ${glow}`,
       }} />
-      {/* Bloom */}
       <div style={{
         position:"absolute", top:-30, left:"50%", transform:"translateX(-50%)",
         width:120, height:70, borderRadius:"50%",
@@ -430,7 +419,6 @@ const MinorInner = memo(function MinorInner({ name, image }: { name:string; imag
         pointerEvents:"none",
       }} />
 
-      {/* Logo — increased from maxWidth:64 height:40 → maxWidth:110 height:80 */}
       <div style={{
         width:"100%", maxWidth:110, height:80,
         display:"flex", alignItems:"center", justifyContent:"center", position:"relative",
@@ -474,7 +462,7 @@ export function Sponsors({
   sectionLabel = "Our Sponsors",
   className,
 }: SponsorsProps) {
-  useEffect(() => { injectFonts(); injectStyles() }, [])
+  useEffect(() => { injectStyles() }, [])
 
   const capped = minorSponsors.slice(0, 4)
 
@@ -512,7 +500,7 @@ export function Sponsors({
         <Divider label={sectionLabel} />
       </div>
 
-      {/* Title sponsor — keeps electric border */}
+      {/* Title sponsor */}
       {titleSponsor.url ? (
         <a href={titleSponsor.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration:"none", display:"block" }}>
           <ElectricBorder color="#cc2200" speed={0.85} chaos={0.09} borderRadius={18} style={{ display:"block" }}>
@@ -525,22 +513,27 @@ export function Sponsors({
         </ElectricBorder>
       )}
 
-      {/* Minor sponsors — plain cards, no electric border */}
+      {/* ✅ Minor sponsors — flex layout, centered, wraps cleanly */}
       {capped.length > 0 && (
         <div style={{ marginTop:"clamp(20px,4vw,28px)" }}>
           <div style={{ marginBottom:"clamp(14px,3vw,18px)" }}>
             <Divider label="Supported By" dimmer />
           </div>
-          <div className="sp2-minor-grid">
+
+          <div className="sp2-minor-flex">
             {capped.map((s) => {
               const card = <MinorInner name={s.name} image={s.image} />
-              return s.url ? (
-                <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer"
-                  style={{ textDecoration:"none", display:"flex", minWidth:0 }}>
-                  {card}
-                </a>
-              ) : (
-                <div key={s.name} style={{ display:"flex", minWidth:0 }}>{card}</div>
+              return (
+                <div key={s.name} className="sp2-minor-item">
+                  {s.url ? (
+                    <a href={s.url} target="_blank" rel="noopener noreferrer"
+                      style={{ textDecoration:"none", display:"flex", height:"100%" }}>
+                      {card}
+                    </a>
+                  ) : (
+                    <div style={{ display:"flex", height:"100%" }}>{card}</div>
+                  )}
+                </div>
               )
             })}
           </div>

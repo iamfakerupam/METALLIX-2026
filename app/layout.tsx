@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SmoothCursor } from "@/components/ui/smooth-cursor";
+import { Orbitron, Rajdhani } from 'next/font/google'
+
+const orbitron = Orbitron({ subsets: ['latin'], weight: ['400','700','900'], variable: '--font-orbitron' })
+const rajdhani = Rajdhani({ subsets: ['latin'], weight: ['400','500','600','700'], variable: '--font-rajdhani' })
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} ${rajdhani.variable} antialiased`}
       >
         
         <SmoothCursor/>

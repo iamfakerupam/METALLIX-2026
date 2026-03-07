@@ -4,17 +4,7 @@ import { motion } from "framer-motion";
 import { Mail, MapPin, Phone, Instagram, Facebook, Linkedin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/* ── Font injection ── */
-let fontsInjected = false;
-function injectFonts() {
-  if (fontsInjected || typeof document === "undefined") return;
-  fontsInjected = true;
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.href =
-    "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap";
-  document.head.appendChild(link);
-}
+
 
 /* ── Ember particle for the METALLIX text ── */
 type Ember = {
@@ -437,7 +427,7 @@ function ContactLink({ children, href }: { children: React.ReactNode; href: stri
 
 /* ── Main Footer ── */
 function MetallixFooter() {
-  useEffect(() => { injectFonts(); }, []);
+  
 
   const eventLinks = [
     { label: "Codemet",     href: "/events/codemet" },
