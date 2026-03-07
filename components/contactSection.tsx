@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useSyncExternalStore } from 'react'
 import ReactDOM from 'react-dom'
 import {
   motion,
@@ -191,22 +191,23 @@ const MinusSVG = () => (
 
 type Contact = typeof CONTACTS[number]
 
+/* ── Client-only mount hook ── */
+const useIsMounted = () =>
+  useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  )
+
 /* ── Cursor Card Portal ── */
-// ✅ Replaced useSyncExternalStore with a simple useEffect mount guard
-// to avoid race conditions and freezing when combined with SmoothCursor
 function CursorCard({ active, cursorX, cursorY }: {
   active: Contact | undefined
   cursorX: ReturnType<typeof useSpring>
   cursorY: ReturnType<typeof useSpring>
 }) {
-  const [mounted, setMounted] = useState(false)
+  const isMounted = useIsMounted()
 
-  useEffect(() => {
-    setMounted(true)
-    return () => setMounted(false)
-  }, [])
-
-  if (!mounted || typeof document === 'undefined') return null
+  if (!isMounted) return null
 
   return ReactDOM.createPortal(
     <div style={{
@@ -557,7 +558,6 @@ export default function ContactUsSection() {
 
   const mouseX = useMotionValue(-9999)
   const mouseY = useMotionValue(-9999)
-  // ✅ Looser spring so cursor card doesn't compete with SmoothCursor's RAF loop
   const springCfg = { damping: 32, stiffness: 600, mass: 0.12 }
   const cursorX = useSpring(mouseX, springCfg)
   const cursorY = useSpring(mouseY, springCfg)
