@@ -61,8 +61,6 @@ const CONTACTS = [
     phone: '+91 7439686232',
     image: '/djabapan.jpeg',
   },
-
- 
 ]
 /* ================================================================ */
 
@@ -105,7 +103,7 @@ const CSS = `
 
 .cu-name {
   transition: color 0.3s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1);
-  color: rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.62);
 }
 .cu-row:hover .cu-name,
 .cu-row.is-active .cu-name {
@@ -114,14 +112,14 @@ const CSS = `
 }
 .cu-index {
   transition: color 0.3s ease;
-  color: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.38);
 }
 .cu-row:hover .cu-index,
 .cu-row.is-active .cu-index { color: rgba(200,30,10,0.9) !important; }
 
 .cu-role {
   transition: color 0.3s ease;
-  color: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.42);
 }
 .cu-row:hover .cu-role,
 .cu-row.is-active .cu-role { color: rgba(180,100,240,0.85) !important; }
@@ -215,7 +213,6 @@ function CursorCard({ active, cursorX, cursorY }: {
       pointerEvents: 'none',
     }}>
       <motion.div style={{ x: cursorX, y: cursorY }}>
-        {/* Single card wrapper — only fades in/out when going from nothing→something or something→nothing */}
         <AnimatePresence>
           {active && (
             <motion.div
@@ -235,7 +232,6 @@ function CursorCard({ active, cursorX, cursorY }: {
                 position: 'relative',
               }}
             >
-              {/* Blurred bg — crossfades instantly on contact change via key */}
               <motion.div
                 key={`bg-${active.id}`}
                 initial={{ opacity: 0 }}
@@ -251,7 +247,6 @@ function CursorCard({ active, cursorX, cursorY }: {
                 }}
               />
 
-              {/* Foreground image — swaps instantly */}
               <motion.img
                 key={`img-${active.id}`}
                 src={active.image}
@@ -272,27 +267,23 @@ function CursorCard({ active, cursorX, cursorY }: {
                 }}
               />
 
-              {/* Top neon line */}
               <div style={{
                 position: 'absolute', top: 0, left: 0, right: 0, height: 2, zIndex: 4,
                 background: `linear-gradient(90deg, transparent, ${T.red.glow} 40%, ${T.purple.glow} 70%, transparent)`,
                 boxShadow: `0 0 8px ${T.red.glow}`,
               }} />
 
-              {/* Left red bar */}
               <div style={{
                 position: 'absolute', top: 0, left: 0, bottom: 0, width: 2, zIndex: 4,
                 background: `linear-gradient(180deg, transparent, ${T.red.glow}, transparent)`,
                 boxShadow: `0 0 6px ${T.red.glow}`,
               }} />
 
-              {/* Bottom gradient fade */}
               <div style={{
                 position: 'absolute', inset: 0, zIndex: 2,
                 background: 'linear-gradient(180deg, transparent 35%, rgba(3,0,0,0.97) 100%)',
               }} />
 
-              {/* Info overlay — content swaps instantly via key */}
               <motion.div
                 key={`info-${active.id}`}
                 initial={{ opacity: 0 }}
@@ -303,7 +294,6 @@ function CursorCard({ active, cursorX, cursorY }: {
                   zIndex: 5, padding: '10px 12px',
                 }}
               >
-                {/* Status dot */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
                   <div style={{
                     width: 5, height: 5, borderRadius: '50%',
@@ -477,12 +467,12 @@ function ContactRow({
           </motion.div>
         )}
 
-        {/* Mobile: position label */}
+        {/* Mobile: position label — brighter */}
         {isMobile && (
           <div style={{
             fontFamily: "'Rajdhani', sans-serif",
             fontSize: 9, fontWeight: 700, letterSpacing: '0.2em',
-            textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)',
+            textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)',
             marginTop: 4, paddingLeft: 28,
           }}>
             {data.position}
@@ -563,7 +553,6 @@ export default function ContactUsSection() {
 
   const mouseX = useMotionValue(-9999)
   const mouseY = useMotionValue(-9999)
-  // Tighter spring so card tracks cursor more tightly — less lag = less "sticking" feeling
   const springCfg = { damping: 28, stiffness: 800, mass: 0.1 }
   const cursorX = useSpring(mouseX, springCfg)
   const cursorY = useSpring(mouseY, springCfg)

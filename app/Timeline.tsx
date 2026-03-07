@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Clock, MapPin, Check, Radio, ChevronRight, Flame } from "lucide-react";
+import { Clock, MapPin, Check, Radio, ChevronRight } from "lucide-react";
 
 /* ─────────────────────────────────────────
    Types
@@ -26,91 +26,82 @@ const isLive      = (s: string, e: string, now: Date) =>
   now >= new Date(s) && now < new Date(e);
 
 /* ─────────────────────────────────────────
-   Theme — purple for done, fire-orange for live, blood-red for upcoming
+   Theme
 ───────────────────────────────────────── */
 const THEME = {
   done: {
-    primary:      "#c084fc",
-    glow:         "rgba(192,132,252,0.95)",
-    soft:         "rgba(192,132,252,0.18)",
-    titleColor:   "#f3e8ff",
-    titleShadow:  "0 0 12px rgba(192,132,252,0.9), 0 0 30px rgba(168,85,247,0.55), 0 0 55px rgba(126,34,206,0.3)",
-    metaColor:    "#e9d5ff",
-    metaShadow:   "0 0 8px rgba(192,132,252,0.8), 0 0 20px rgba(168,85,247,0.4)",
-    border:       "rgba(192,132,252,0.50)",
-    borderHover:  "rgba(192,132,252,0.80)",
-    badge:        "linear-gradient(90deg,#4c1d95,#9333ea)",
-    badgeShadow:  "0 0 12px rgba(168,85,247,0.80)",
-    trackDot:     "#a855f7",
-    trackGlow:    "rgba(168,85,247,0.70)",
-    number:       "rgba(168,85,247,0.15)",
-    cardBg:       "rgba(10,2,18,0.90)",
-    cardHoverBg:  "rgba(14,4,24,0.96)",
-    tagColor:     "#d8b4fe",
-    tagBorder:    "rgba(168,85,247,0.35)",
-    metaBg:       "rgba(50,0,80,0.30)",
-    metaBorder:   "rgba(168,85,247,0.28)",
-    topLine:      "linear-gradient(90deg,transparent,rgba(168,85,247,0.9),rgba(192,132,252,1.0),rgba(255,255,255,0.6),rgba(192,132,252,1.0),rgba(168,85,247,0.9),transparent)",
-    leftBar:      "linear-gradient(180deg,transparent,rgba(192,132,252,0.9),rgba(168,85,247,0.6),transparent)",
-    iconGlow:     "drop-shadow(0 0 5px rgba(192,132,252,0.9))",
-    shimmer:      "rgba(168,85,247,0.08)",
+    primary:     "#c084fc",
+    glow:        "rgba(192,132,252,0.95)",
+    soft:        "rgba(192,132,252,0.18)",
+    titleColor:  "#f3e8ff",
+    titleShadow: "0 0 12px rgba(192,132,252,0.9),0 0 30px rgba(168,85,247,0.55)",
+    metaColor:   "#e9d5ff",
+    metaShadow:  "0 0 8px rgba(192,132,252,0.8)",
+    border:      "rgba(192,132,252,0.50)",
+    badge:       "linear-gradient(90deg,#4c1d95,#9333ea)",
+    badgeShadow: "0 0 12px rgba(168,85,247,0.80)",
+    trackDot:    "#a855f7",
+    trackGlow:   "rgba(168,85,247,0.70)",
+    number:      "rgba(168,85,247,0.15)",
+    cardBg:      "rgba(10,2,18,0.90)",
+    tagColor:    "#d8b4fe",
+    tagBorder:   "rgba(168,85,247,0.35)",
+    metaBg:      "rgba(50,0,80,0.30)",
+    metaBorder:  "rgba(168,85,247,0.28)",
+    topLine:     "linear-gradient(90deg,transparent,rgba(168,85,247,0.9),rgba(192,132,252,1.0),rgba(255,255,255,0.6),rgba(192,132,252,1.0),rgba(168,85,247,0.9),transparent)",
+    leftBar:     "linear-gradient(180deg,transparent,rgba(192,132,252,0.9),rgba(168,85,247,0.6),transparent)",
+    iconGlow:    "drop-shadow(0 0 5px rgba(192,132,252,0.9))",
   },
   live: {
-    primary:      "#fb923c",
-    glow:         "rgba(251,146,60,0.98)",
-    soft:         "rgba(251,146,60,0.20)",
-    titleColor:   "#fff7ed",
-    titleShadow:  "0 0 10px rgba(251,146,60,1.0), 0 0 28px rgba(239,68,68,0.75), 0 0 52px rgba(220,38,38,0.4)",
-    metaColor:    "#fed7aa",
-    metaShadow:   "0 0 8px rgba(251,146,60,0.92), 0 0 20px rgba(239,68,68,0.55)",
-    border:       "rgba(251,146,60,0.65)",
-    borderHover:  "rgba(251,146,60,0.95)",
-    badge:        "linear-gradient(90deg,#7c2d12,#ea580c)",
-    badgeShadow:  "0 0 16px rgba(251,146,60,0.90)",
-    trackDot:     "#f97316",
-    trackGlow:    "rgba(249,115,22,0.85)",
-    number:       "rgba(251,146,60,0.15)",
-    cardBg:       "rgba(16,4,0,0.92)",
-    cardHoverBg:  "rgba(22,6,0,0.97)",
-    tagColor:     "#fdba74",
-    tagBorder:    "rgba(251,146,60,0.40)",
-    metaBg:       "rgba(80,20,0,0.35)",
-    metaBorder:   "rgba(251,146,60,0.35)",
-    topLine:      "linear-gradient(90deg,transparent,rgba(239,68,68,0.8),rgba(251,146,60,1.0),rgba(255,255,255,0.7),rgba(251,146,60,1.0),rgba(239,68,68,0.8),transparent)",
-    leftBar:      "linear-gradient(180deg,transparent,rgba(251,146,60,0.95),rgba(239,68,68,0.7),transparent)",
-    iconGlow:     "drop-shadow(0 0 5px rgba(251,146,60,0.95))",
-    shimmer:      "rgba(251,146,60,0.07)",
+    primary:     "#fb923c",
+    glow:        "rgba(251,146,60,0.98)",
+    soft:        "rgba(251,146,60,0.20)",
+    titleColor:  "#fff7ed",
+    titleShadow: "0 0 10px rgba(251,146,60,1.0),0 0 28px rgba(239,68,68,0.75)",
+    metaColor:   "#fed7aa",
+    metaShadow:  "0 0 8px rgba(251,146,60,0.92)",
+    border:      "rgba(251,146,60,0.65)",
+    badge:       "linear-gradient(90deg,#7c2d12,#ea580c)",
+    badgeShadow: "0 0 16px rgba(251,146,60,0.90)",
+    trackDot:    "#f97316",
+    trackGlow:   "rgba(249,115,22,0.85)",
+    number:      "rgba(251,146,60,0.15)",
+    cardBg:      "rgba(16,4,0,0.92)",
+    tagColor:    "#fdba74",
+    tagBorder:   "rgba(251,146,60,0.40)",
+    metaBg:      "rgba(80,20,0,0.35)",
+    metaBorder:  "rgba(251,146,60,0.35)",
+    topLine:     "linear-gradient(90deg,transparent,rgba(239,68,68,0.8),rgba(251,146,60,1.0),rgba(255,255,255,0.7),rgba(251,146,60,1.0),rgba(239,68,68,0.8),transparent)",
+    leftBar:     "linear-gradient(180deg,transparent,rgba(251,146,60,0.95),rgba(239,68,68,0.7),transparent)",
+    iconGlow:    "drop-shadow(0 0 5px rgba(251,146,60,0.95))",
   },
   upcoming: {
-    primary:      "#ef4444",
-    glow:         "rgba(239,68,68,0.75)",
-    soft:         "rgba(239,68,68,0.12)",
-    titleColor:   "#ffe4e4",
-    titleShadow:  "0 0 8px rgba(239,68,68,0.65), 0 0 22px rgba(185,28,28,0.35)",
-    metaColor:    "#fca5a5",
-    metaShadow:   "0 0 6px rgba(239,68,68,0.60)",
-    border:       "rgba(239,68,68,0.28)",
-    borderHover:  "rgba(239,68,68,0.65)",
-    badge:        "linear-gradient(90deg,#7f1d1d,#dc2626)",
-    badgeShadow:  "0 0 8px rgba(239,68,68,0.55)",
-    trackDot:     "rgba(239,68,68,0.45)",
-    trackGlow:    "rgba(239,68,68,0.50)",
-    number:       "rgba(239,68,68,0.10)",
-    cardBg:       "rgba(8,0,0,0.72)",
-    cardHoverBg:  "rgba(14,0,0,0.88)",
-    tagColor:     "#f87171",
-    tagBorder:    "rgba(239,68,68,0.22)",
-    metaBg:       "rgba(50,0,0,0.28)",
-    metaBorder:   "rgba(239,68,68,0.18)",
-    topLine:      "linear-gradient(90deg,transparent,rgba(185,28,28,0.7),rgba(239,68,68,0.9),rgba(239,68,68,0.9),rgba(185,28,28,0.7),transparent)",
-    leftBar:      "linear-gradient(180deg,transparent,rgba(239,68,68,0.75),transparent)",
-    iconGlow:     "drop-shadow(0 0 4px rgba(239,68,68,0.65))",
-    shimmer:      "rgba(239,68,68,0.05)",
+    primary:     "#ef4444",
+    glow:        "rgba(239,68,68,0.75)",
+    soft:        "rgba(239,68,68,0.12)",
+    titleColor:  "#ffe4e4",
+    titleShadow: "0 0 8px rgba(239,68,68,0.65)",
+    metaColor:   "#fca5a5",
+    metaShadow:  "0 0 6px rgba(239,68,68,0.60)",
+    border:      "rgba(239,68,68,0.28)",
+    badge:       "linear-gradient(90deg,#7f1d1d,#dc2626)",
+    badgeShadow: "0 0 8px rgba(239,68,68,0.55)",
+    trackDot:    "rgba(239,68,68,0.45)",
+    trackGlow:   "rgba(239,68,68,0.50)",
+    number:      "rgba(239,68,68,0.10)",
+    cardBg:      "rgba(8,0,0,0.72)",
+    tagColor:    "#f87171",
+    tagBorder:   "rgba(239,68,68,0.22)",
+    metaBg:      "rgba(50,0,0,0.28)",
+    metaBorder:  "rgba(239,68,68,0.18)",
+    topLine:     "linear-gradient(90deg,transparent,rgba(185,28,28,0.7),rgba(239,68,68,0.9),rgba(185,28,28,0.7),transparent)",
+    leftBar:     "linear-gradient(180deg,transparent,rgba(239,68,68,0.75),transparent)",
+    iconGlow:    "drop-shadow(0 0 4px rgba(239,68,68,0.65))",
   },
 } as const;
 
 /* ─────────────────────────────────────────
-   Format helpers
+   Helpers
 ───────────────────────────────────────── */
 const fmtTime = (d: Date) =>
   d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
@@ -118,566 +109,426 @@ const fmtDate = (d: Date) =>
   d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
 
 /* ─────────────────────────────────────────
-   Card
+   Card — memoised to prevent cascade re-renders
 ───────────────────────────────────────── */
-function TimelineCard({ item, index, now }: {
-  item: TimelineItem; index: number; now: Date;
-}) {
-  const [hov, setHov] = useState(false);
+const TimelineCard = React.memo(function TimelineCard({
+  item, index, now,
+}: { item: TimelineItem; index: number; now: Date }) {
   const done  = isCompleted(item.endTime, now);
   const live  = isLive(item.startTime, item.endTime, now);
   const t     = done ? THEME.done : live ? THEME.live : THEME.upcoming;
-  const lit   = done || live || hov;
   const start = new Date(item.startTime);
   const end   = new Date(item.endTime);
 
   return (
     <motion.div
       variants={{
-        hidden:  { opacity: 0, y: 22, scale: 0.96 },
-        visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 200, damping: 22 } },
+        hidden:  { opacity: 0, y: 20, scale: 0.97 },
+        visible: { opacity: 1, y: 0,  scale: 1,
+          transition: { type: "spring", stiffness: 180, damping: 24 } },
       }}
-      style={{ position: "relative" }}
+      className="relative min-w-0 h-full"
     >
-      {/* ── Track node ── */}
-      <div style={{
-        position: "absolute", left: -38, top: 22,
-        width: 22, height: 22, borderRadius: "50%",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        zIndex: 4,
-        background: done
-          ? "linear-gradient(135deg,#4c1d95,#9333ea)"
-          : live
-          ? "linear-gradient(135deg,#7c2d12,#ea580c)"
-          : "rgba(10,0,0,0.92)",
-        border: `2px solid ${t.trackDot}`,
-        boxShadow: live
-          ? `0 0 0 5px rgba(251,146,60,0.12), 0 0 22px ${t.trackGlow}`
-          : done
-          ? `0 0 14px ${t.trackGlow}`
-          : "none",
-        animation: live ? "tl-node-fire 1.6s ease-in-out infinite" : "none",
-        transition: "all 0.3s",
-      }}>
-        {done ? (
-          <Check size={11} color="#fff" strokeWidth={3} />
-        ) : live ? (
-          <>
-            <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#fff", boxShadow: `0 0 8px ${t.glow}` }} />
-            <div style={{ position: "absolute", inset: -5, borderRadius: "50%", border: `2px solid rgba(251,146,60,0.55)`, animation: "tl-ping 1.2s ease-out infinite" }} />
-          </>
-        ) : (
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "rgba(239,68,68,0.35)" }} />
-        )}
-      </div>
-
-      {/* ── Card shell ── */}
+      {/* Card */}
       <div
-        onMouseEnter={() => setHov(true)}
-        onMouseLeave={() => setHov(false)}
+        className="relative overflow-hidden rounded-2xl min-w-0 h-full flex flex-col"
         style={{
-          position: "relative",
-          borderRadius: 14,
-          background: hov ? t.cardHoverBg : t.cardBg,
-          border: `1px solid ${lit ? t.border : "rgba(180,0,0,0.07)"}`,
-          boxShadow: hov
-            ? `0 0 0 1px ${t.soft}, 0 0 40px ${t.soft}, 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)`
-            : live
-            ? `0 0 28px rgba(251,146,60,0.10), 0 4px 20px rgba(0,0,0,0.4)`
-            : `0 4px 20px rgba(0,0,0,0.35)`,
-          opacity: (!done && !live) ? 0.82 : 1,
-          transform: hov ? "translateY(-4px)" : "translateY(0)",
-          transition: "transform 0.22s ease, border-color 0.22s, box-shadow 0.22s, background 0.22s, opacity 0.28s",
-          overflow: "hidden",
-          padding: "18px 20px 16px 22px",
-          willChange: "transform",
+          background: t.cardBg,
+          border: `1px solid ${t.border}`,
+          boxShadow: live
+            ? `0 0 0 1px ${t.soft},0 0 40px ${t.soft},0 8px 32px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.04)`
+            : done ? `0 0 0 1px ${t.soft},0 0 28px ${t.soft},0 4px 20px rgba(0,0,0,0.4)`
+            : `0 0 18px rgba(239,68,68,0.07),0 4px 20px rgba(0,0,0,0.35)`,
+          /* extra left padding makes room for the in-card node */
+          padding: "18px 20px 20px 52px",
         }}
       >
-        {/* ── Top neon accent bar ── */}
-        <div style={{
-          position: "absolute", top: 0, left: 0, right: 0, height: 2,
-          background: lit ? t.topLine : "none",
-          boxShadow: lit ? `0 0 18px ${t.glow}, 0 0 35px ${t.soft}` : "none",
-          transition: "box-shadow 0.22s",
-          animation: live ? "tl-topbar-flicker 2.8s ease-in-out infinite" : "none",
-        }} />
+        {/* ── Track node — lives inside the card, never bleeds into siblings ── */}
+        <div
+          className="absolute z-10 flex items-center justify-center rounded-full"
+          style={{
+            left: 16, top: 18, width: 22, height: 22,
+            background: done
+              ? "linear-gradient(135deg,#4c1d95,#9333ea)"
+              : live ? "linear-gradient(135deg,#7c2d12,#ea580c)"
+              : "rgba(10,0,0,0.92)",
+            border: `2px solid ${t.trackDot}`,
+            boxShadow: live
+              ? `0 0 0 5px rgba(251,146,60,0.12),0 0 22px ${t.trackGlow}`
+              : done ? `0 0 14px ${t.trackGlow}` : "none",
+            animation: live ? "tl-node-fire 1.6s ease-in-out infinite" : "none",
+          }}
+        >
+          {done ? (
+            <Check size={11} color="#fff" strokeWidth={3} />
+          ) : live ? (
+            <>
+              <div className="rounded-full"
+                style={{ width: 7, height: 7, background: "#fff", boxShadow: `0 0 8px ${t.glow}` }} />
+              <div className="absolute rounded-full"
+                style={{ inset: -5, border: `2px solid rgba(251,146,60,0.55)`,
+                  animation: "tl-ping 1.2s ease-out infinite" }} />
+            </>
+          ) : (
+            <div className="rounded-full"
+              style={{ width: 6, height: 6, background: "rgba(239,68,68,0.35)" }} />
+          )}
+        </div>
+        {/* Top bar */}
+        <div className="absolute inset-x-0 top-0 h-0.5"
+          style={{ background: t.topLine,
+            boxShadow: `0 0 18px ${t.glow},0 0 35px ${t.soft}`,
+            animation: live ? "tl-topbar-flicker 2.8s ease-in-out infinite" : "none" }} />
+        {/* Left bar — starts at 46px to sit right of the node */}
+        <div className="absolute rounded-r"
+          style={{ left: 46, top: "12%", bottom: "12%", width: 3,
+            background: t.leftBar, boxShadow: `2px 0 12px ${t.glow}` }} />
+        {/* Bottom bar */}
+        <div className="absolute inset-x-0 bottom-0 h-0.5"
+          style={{ background: `linear-gradient(90deg,${t.glow},${t.primary},rgba(255,255,255,0.4),${t.primary},transparent)`,
+            boxShadow: `0 0 12px ${t.glow}` }} />
+        {/* Corner TL */}
+        <div className="absolute top-0 left-0 w-5 h-5 rounded-tl-2xl"
+          style={{ borderTop: `2px solid ${t.border}`, borderLeft: `2px solid ${t.border}` }} />
+        {/* Corner BR */}
+        <div className="absolute bottom-0 right-0 w-7 h-7 rounded-br-2xl"
+          style={{ borderBottom: `2px solid ${t.border}`, borderRight: `2px solid ${t.border}` }} />
 
-        {/* ── Left accent bar ── */}
-        <div style={{
-          position: "absolute", left: 0, top: "12%", bottom: "12%", width: 3,
-          borderRadius: "0 3px 3px 0",
-          background: lit ? t.leftBar : "transparent",
-          boxShadow: lit ? `2px 0 12px ${t.glow}` : "none",
-          opacity: lit ? 1 : 0,
-          transition: "opacity 0.22s, box-shadow 0.22s",
-        }} />
-
-        {/* ── Shimmer sweep on hover ── */}
-        <div style={{
-          position: "absolute", inset: 0,
-          background: `linear-gradient(105deg, transparent 40%, ${t.shimmer} 50%, transparent 60%)`,
-          transform: hov ? "translateX(100%)" : "translateX(-100%)",
-          transition: hov ? "transform 0.55s ease" : "none",
-          pointerEvents: "none",
-        }} />
-
-        {/* ── Ghost index ── */}
-        <div style={{
-          position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
-          fontFamily: "'Orbitron', monospace",
-          fontSize: "clamp(2.6rem,4.5vw,3.8rem)",
-          fontWeight: 900, lineHeight: 1,
-          color: lit ? t.number : "rgba(120,0,0,0.07)",
-          userSelect: "none", pointerEvents: "none",
-          textShadow: lit ? `0 0 40px ${t.glow}` : "none",
-          transition: "color 0.22s, text-shadow 0.22s",
-        }}>
+        {/* Ghost number */}
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 select-none pointer-events-none font-black leading-none"
+          style={{
+            fontFamily: "'Orbitron',monospace",
+            fontSize: "clamp(2.2rem,3.5vw,3.2rem)",
+            color: t.number, textShadow: `0 0 40px ${t.glow}`,
+          }}>
           {String(index + 1).padStart(2, "0")}
         </div>
 
-        {/* ── Header ── */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, marginBottom: 10 }}>
-          <h3 style={{
-            fontFamily: "'Orbitron', monospace",
-            fontSize: "clamp(0.72rem,1.5vw,0.92rem)",
-            fontWeight: 700, letterSpacing: "0.07em",
-            color: lit ? t.titleColor : "rgba(255,190,190,0.50)",
-            margin: 0, textTransform: "uppercase",
-            textShadow: lit ? t.titleShadow : "none",
-            transition: "color 0.22s, text-shadow 0.22s",
-            lineHeight: 1.3, maxWidth: "70%",
-            animation: live ? "tl-title-fire 2.4s ease-in-out infinite" : "none",
-          }}>
+        {/* Title + badge */}
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <h3 className="uppercase font-bold leading-snug m-0"
+            style={{
+              fontFamily: "'Orbitron',monospace",
+              fontSize: "clamp(0.65rem,1.3vw,0.85rem)",
+              letterSpacing: "0.07em",
+              color: t.titleColor, textShadow: t.titleShadow,
+              maxWidth: "68%",
+              animation: live ? "tl-title-fire 2.4s ease-in-out infinite" : "none",
+            }}>
             {item.title}
           </h3>
-
-          {/* Badge */}
-          <div style={{
-            flexShrink: 0,
-            background: t.badge,
-            color: "#fff",
-            fontFamily: "'Orbitron', monospace",
-            fontSize: 7.5, fontWeight: 700, letterSpacing: "0.14em",
-            padding: "3px 9px", borderRadius: 4,
-            boxShadow: t.badgeShadow,
-            textTransform: "uppercase",
-            textShadow: "0 0 8px rgba(255,255,255,0.5)",
-            animation: live ? "tl-badge-blink 1.8s ease-in-out infinite" : "none",
-          }}>
+          <div className="shrink-0 uppercase font-bold text-white rounded"
+            style={{
+              fontFamily: "'Orbitron',monospace",
+              fontSize: 7, letterSpacing: "0.14em",
+              padding: "3px 8px",
+              background: t.badge, boxShadow: t.badgeShadow,
+              textShadow: "0 0 8px rgba(255,255,255,0.5)",
+              animation: live ? "tl-badge-blink 1.8s ease-in-out infinite" : "none",
+            }}>
             {done ? "✓ DONE" : live ? "🔥 LIVE" : "SOON"}
           </div>
         </div>
 
-        {/* ── Tag ── */}
+        {/* Tag */}
         {item.tag && (
-          <div style={{
-            display: "inline-flex", alignItems: "center",
-            background: "rgba(0,0,0,0.30)",
-            border: `1px solid ${t.tagBorder}`,
-            borderRadius: 4, padding: "2px 9px", marginBottom: 10,
-            fontFamily: "'Rajdhani', sans-serif",
-            fontSize: 9.5, fontWeight: 700, letterSpacing: "0.14em",
-            color: lit ? t.tagColor : "rgba(200,80,80,0.35)",
-            textShadow: lit ? `0 0 8px ${t.glow}` : "none",
-            textTransform: "uppercase",
-            transition: "color 0.22s, text-shadow 0.22s",
-          }}>
+          <div className="inline-flex items-center uppercase font-bold rounded mb-2"
+            style={{
+              fontFamily: "'Rajdhani',sans-serif",
+              fontSize: 9, letterSpacing: "0.14em",
+              padding: "2px 8px",
+              background: "rgba(0,0,0,0.30)",
+              border: `1px solid ${t.tagBorder}`,
+              color: t.tagColor, textShadow: `0 0 8px ${t.glow}`,
+            }}>
             {item.tag}
           </div>
         )}
 
-        {/* ── Description ── */}
+        {/* Description */}
         {item.description && (
-          <p style={{
-            fontFamily: "'Rajdhani', sans-serif",
-            fontSize: 12.5, fontWeight: 500, lineHeight: 1.65,
-            color: lit ? "rgba(255,220,220,0.60)" : "rgba(255,160,160,0.30)",
-            margin: "0 0 12px", letterSpacing: "0.02em",
-            transition: "color 0.22s",
-          }}>
+          <p className="mb-3 leading-relaxed m-0"
+            style={{
+              fontFamily: "'Rajdhani',sans-serif",
+              fontSize: 12, fontWeight: 500,
+              color: "rgba(255,220,220,0.60)",
+            }}>
             {item.description}
           </p>
         )}
 
-        {/* ── Meta pill ── */}
-        <div style={{
-          display: "flex", flexDirection: "column", gap: 7,
-          padding: "10px 13px", borderRadius: 9,
-          background: lit ? t.metaBg : "rgba(0,0,0,0.22)",
-          border: `1px solid ${lit ? t.metaBorder : "rgba(160,0,0,0.06)"}`,
-          marginTop: 6,
-          boxShadow: lit ? `inset 0 0 22px rgba(0,0,0,0.45), 0 0 1px ${t.soft}` : "none",
-          transition: "background 0.22s, border-color 0.22s",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-            <span style={{
-              color: lit ? t.glow : "rgba(180,60,60,0.28)",
-              filter: lit ? t.iconGlow : "none",
-              display: "flex", alignItems: "center", flexShrink: 0,
-              transition: "color 0.22s, filter 0.22s",
-            }}>
-              <Clock size={13} />
+        {/* Meta */}
+        <div className="flex flex-col gap-1.5 rounded-xl mt-auto pt-2"
+          style={{
+            padding: "9px 12px",
+            background: t.metaBg,
+            border: `1px solid ${t.metaBorder}`,
+            boxShadow: "inset 0 0 22px rgba(0,0,0,0.45)",
+          }}>
+          <div className="flex items-center gap-2">
+            <span className="flex shrink-0" style={{ color: t.glow, filter: t.iconGlow }}>
+              <Clock size={12} />
             </span>
-            <span style={{
-              fontFamily: "'Rajdhani', sans-serif",
-              fontSize: 13.5, fontWeight: 700, letterSpacing: "0.05em",
-              color: lit ? t.metaColor : "rgba(210,100,100,0.38)",
-              textShadow: lit ? t.metaShadow : "none",
-              transition: "color 0.22s, text-shadow 0.22s",
-              animation: live ? "tl-meta-fire 3.2s ease-in-out infinite" : "none",
-            }}>
-              {fmtDate(start)}&nbsp;&nbsp;·&nbsp;&nbsp;{fmtTime(start)} – {fmtTime(end)}
+            <span className="font-bold truncate"
+              style={{
+                fontFamily: "'Rajdhani',sans-serif",
+                fontSize: 13, letterSpacing: "0.04em",
+                color: t.metaColor, textShadow: t.metaShadow,
+                animation: live ? "tl-meta-fire 3.2s ease-in-out infinite" : "none",
+              }}>
+              {fmtDate(start)}&nbsp;·&nbsp;{fmtTime(start)}–{fmtTime(end)}
             </span>
           </div>
-
-          <div style={{
-            height: 1,
-            background: lit
-              ? `linear-gradient(90deg,transparent,${t.metaBorder},${t.soft},transparent)`
-              : "rgba(120,0,0,0.07)",
-          }} />
-
-          <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-            <span style={{
-              color: lit ? t.glow : "rgba(180,60,60,0.28)",
-              filter: lit ? t.iconGlow : "none",
-              display: "flex", alignItems: "center", flexShrink: 0,
-              transition: "color 0.22s, filter 0.22s",
-            }}>
-              <MapPin size={13} />
+          <div className="h-px"
+            style={{ background: `linear-gradient(90deg,transparent,${t.metaBorder},transparent)` }} />
+          <div className="flex items-center gap-2">
+            <span className="flex shrink-0" style={{ color: t.glow, filter: t.iconGlow }}>
+              <MapPin size={12} />
             </span>
-            <span style={{
-              fontFamily: "'Rajdhani', sans-serif",
-              fontSize: 13.5, fontWeight: 700, letterSpacing: "0.04em",
-              color: lit ? t.metaColor : "rgba(210,100,100,0.38)",
-              textShadow: lit ? t.metaShadow : "none",
-              transition: "color 0.22s, text-shadow 0.22s",
-              animation: live ? "tl-meta-fire 3.6s ease-in-out infinite" : "none",
-            }}>
+            <span className="font-bold truncate"
+              style={{
+                fontFamily: "'Rajdhani',sans-serif",
+                fontSize: 13, letterSpacing: "0.04em",
+                color: t.metaColor, textShadow: t.metaShadow,
+                animation: live ? "tl-meta-fire 3.6s ease-in-out infinite" : "none",
+              }}>
               {item.venue}
             </span>
           </div>
         </div>
-
-        {/* ── Hover sweep bottom bar ── */}
-        <div style={{
-          position: "absolute", bottom: 0, left: 0, right: 0, height: 2,
-          background: `linear-gradient(90deg,${t.glow},${t.primary},rgba(255,255,255,0.4),${t.primary},transparent)`,
-          transformOrigin: "left",
-          transform: hov ? "scaleX(1)" : "scaleX(0)",
-          transition: "transform 0.30s ease",
-          boxShadow: `0 0 12px ${t.glow}`,
-        }} />
-
-        {/* ── Bottom-right corner accent ── */}
-        <div style={{
-          position: "absolute", bottom: 0, right: 0,
-          width: 28, height: 28,
-          borderBottom: `2px solid ${lit ? t.border : "transparent"}`,
-          borderRight:  `2px solid ${lit ? t.border : "transparent"}`,
-          borderRadius: "0 0 14px 0",
-          transition: "border-color 0.22s",
-        }} />
-        {/* ── Top-left corner accent ── */}
-        <div style={{
-          position: "absolute", top: 0, left: 0,
-          width: 22, height: 22,
-          borderTop:  `2px solid ${lit ? t.border : "transparent"}`,
-          borderLeft: `2px solid ${lit ? t.border : "transparent"}`,
-          borderRadius: "14px 0 0 0",
-          transition: "border-color 0.22s",
-        }} />
       </div>
     </motion.div>
   );
-}
+});
 
 /* ─────────────────────────────────────────
-   Main export
+   Main
 ───────────────────────────────────────── */
 export default function GlowingTimeline({ items }: TimelineProps) {
-  const [now, setNow]             = useState(new Date());
-  const containerRef              = useRef<HTMLDivElement>(null);
-  const trackRef                  = useRef<HTMLDivElement>(null);
-  const [progressH, setProgressH] = useState(0);
+  const [now, setNow] = useState(() => new Date());
+  const containerRef  = useRef<HTMLDivElement>(null);
 
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
-  const bgY = useTransform(scrollYProgress, [0, 1], [30, -30]);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+  const bgY1 = useTransform(scrollYProgress, [0, 1], [30, -30]);
+  const bgY2 = useTransform(scrollYProgress, [0, 1], [-20, 20]);
 
+  /* Tick every 60 s — avoids 60 redundant renders per minute */
   useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 30_000);
-    return () => clearInterval(t);
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
   }, []);
 
-  useEffect(() => {
-    const done = items.filter(it => now >= new Date(it.endTime)).length;
-    const frac = items.length > 0 ? done / items.length : 0;
-    if (trackRef.current) setProgressH(trackRef.current.offsetHeight * frac);
-  }, [now, items]);
-
-  const grouped = items.reduce<Record<string, TimelineItem[]>>((acc, item) => {
-    const day = new Date(item.startTime).toLocaleDateString("en-IN", {
-      weekday: "long", day: "numeric", month: "long", year: "numeric",
-    });
-    if (!acc[day]) acc[day] = [];
-    acc[day].push(item);
-    return acc;
-  }, {});
+  /* Group by day — memoised */
+  const grouped = React.useMemo(() =>
+    items.reduce<Record<string, TimelineItem[]>>((acc, item) => {
+      const day = new Date(item.startTime).toLocaleDateString("en-IN", {
+        weekday: "long", day: "numeric", month: "long", year: "numeric",
+      });
+      (acc[day] ??= []).push(item);
+      return acc;
+    }, {}),
+  [items]);
 
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
 
-        /* ── Node animations ── */
-        @keyframes tl-ping     { 0%{transform:scale(1);opacity:.85} 100%{transform:scale(2.5);opacity:0} }
-        @keyframes tl-node-fire{
-          0%,100%{box-shadow:0 0 0 4px rgba(251,146,60,0.10),0 0 14px rgba(251,146,60,0.65)}
-          50%{box-shadow:0 0 0 8px rgba(251,146,60,0.06),0 0 36px rgba(251,146,60,1.0)}
+        @keyframes tl-ping { 0%{transform:scale(1);opacity:.85} 100%{transform:scale(2.5);opacity:0} }
+        @keyframes tl-node-fire {
+          0%,100%{ box-shadow:0 0 0 4px rgba(251,146,60,.10),0 0 14px rgba(251,146,60,.65) }
+          50%    { box-shadow:0 0 0 8px rgba(251,146,60,.06),0 0 36px rgba(251,146,60,1.0)  }
         }
-
-        /* ── Badge ── */
-        @keyframes tl-badge-blink{ 0%,100%{opacity:1} 50%{opacity:.42} }
-
-        /* ── Text fire effects ── */
-        @keyframes tl-title-fire{
-          0%,100%{text-shadow:0 0 10px rgba(251,146,60,1.0),0 0 28px rgba(239,68,68,0.80),0 0 52px rgba(220,38,38,0.40)}
-          30%{text-shadow:0 0 16px rgba(253,186,116,0.9),0 0 36px rgba(251,146,60,0.90),0 0 62px rgba(239,68,68,0.50);filter:brightness(1.1)}
-          65%{text-shadow:0 0 8px rgba(251,146,60,0.80),0 0 22px rgba(239,68,68,0.65),0 0 44px rgba(220,38,38,0.35)}
+        @keyframes tl-badge-blink { 0%,100%{opacity:1} 50%{opacity:.42} }
+        @keyframes tl-title-fire {
+          0%,100%{ text-shadow:0 0 10px rgba(251,146,60,1),0 0 28px rgba(239,68,68,.80) }
+          50%    { text-shadow:0 0 18px rgba(253,186,116,.9),0 0 40px rgba(251,146,60,.90);filter:brightness(1.1) }
         }
-        @keyframes tl-meta-fire{
-          0%,100%{text-shadow:0 0 7px rgba(251,146,60,0.88),0 0 16px rgba(239,68,68,0.50)}
-          45%{text-shadow:0 0 12px rgba(253,186,116,0.85),0 0 24px rgba(251,146,60,0.70)}
+        @keyframes tl-meta-fire {
+          0%,100%{ text-shadow:0 0 7px rgba(251,146,60,.88)   }
+          50%    { text-shadow:0 0 14px rgba(253,186,116,.85)  }
         }
-        @keyframes tl-topbar-flicker{0%,100%{opacity:1}45%{opacity:0.68}58%{opacity:0.94}}
-
-        /* ── Header ── */
-        @keyframes tl-glitch{
+        @keyframes tl-topbar-flicker { 0%,100%{opacity:1} 45%{opacity:.68} 58%{opacity:.94} }
+        @keyframes tl-glitch {
           0%,93%,100%{transform:none;opacity:1}
           94%{transform:translateX(5px);opacity:.70}
           95%{transform:translateX(-3px)}
           96%{transform:none}
         }
-        @keyframes tl-header-fire{
-          0%,100%{filter:drop-shadow(0 0 18px rgba(239,68,68,0.55)) drop-shadow(0 0 40px rgba(168,85,247,0.28))}
-          50%{filter:drop-shadow(0 0 28px rgba(251,146,60,0.70)) drop-shadow(0 0 55px rgba(192,132,252,0.38))}
+        @keyframes tl-header-fire {
+          0%,100%{filter:drop-shadow(0 0 18px rgba(239,68,68,.55)) drop-shadow(0 0 40px rgba(168,85,247,.28))}
+          50%    {filter:drop-shadow(0 0 28px rgba(251,146,60,.70)) drop-shadow(0 0 55px rgba(192,132,252,.38))}
         }
-        @keyframes tl-underline-flame{
-          0%,100%{background-position:0% 50%;box-shadow:0 0 14px rgba(249,115,22,0.50),0 0 28px rgba(147,51,234,0.30)}
-          50%{background-position:100% 50%;box-hadow:0 0 24px rgba(249,115,22,0.75),0 0 44px rgba(147,51,234,0.50)}
+        @keyframes tl-underline-flame {
+          0%,100%{ background-position:0%   50%; box-shadow:0 0 14px rgba(249,115,22,.50),0 0 28px rgba(147,51,234,.30) }
+          50%    { background-position:100% 50%; box-shadow:0 0 24px rgba(249,115,22,.75),0 0 44px rgba(147,51,234,.50) }
         }
-        @keyframes tl-pill-flicker{
-          0%,100%{color:rgba(216,180,254,0.75);text-shadow:0 0 10px rgba(168,85,247,0.50)}
-          50%{color:rgba(240,160,255,0.90);text-shadow:0 0 18px rgba(192,132,252,0.78)}
+        @keyframes tl-pill-flicker {
+          0%,100%{ color:rgba(216,180,254,.75);text-shadow:0 0 10px rgba(168,85,247,.50) }
+          50%    { color:rgba(240,160,255,.90);text-shadow:0 0 18px rgba(192,132,252,.78) }
         }
-        @keyframes tl-dot-blink{0%,100%{opacity:1}50%{opacity:.15}}
-        @keyframes tl-clock-glow{
-          0%,100%{text-shadow:0 0 8px rgba(168,85,247,0.50)}
-          50%{text-shadow:0 0 14px rgba(192,132,252,0.75),0 0 28px rgba(168,85,247,0.35)}
+        @keyframes tl-dot-blink  { 0%,100%{opacity:1} 50%{opacity:.15} }
+        @keyframes tl-clock-glow {
+          0%,100%{ text-shadow:0 0 8px rgba(168,85,247,.50)  }
+          50%    { text-shadow:0 0 14px rgba(192,132,252,.75) }
         }
-        @keyframes tl-scanline{0%{transform:translateY(-100%)}100%{transform:translateY(320%)}}
-        @keyframes tl-day-glow{
-          0%,100%{color:rgba(210,150,255,0.72);text-shadow:0 0 12px rgba(168,85,247,0.55),0 0 25px rgba(120,0,200,0.28)}
-          50%{color:rgba(230,175,255,0.88);text-shadow:0 0 20px rgba(192,132,252,0.80),0 0 40px rgba(147,51,234,0.42)}
+        @keyframes tl-scanline   { 0%{transform:translateY(-100%)} 100%{transform:translateY(320%)} }
+        @keyframes tl-day-glow {
+          0%,100%{ color:rgba(210,150,255,.72);text-shadow:0 0 12px rgba(168,85,247,.55) }
+          50%    { color:rgba(230,175,255,.88);text-shadow:0 0 20px rgba(192,132,252,.80) }
         }
-
-        /* ── Legend ── */
-        @keyframes tl-legend-pulse{0%,100%{opacity:.65}50%{opacity:1}}
-
-        /* ── Track progress ── */
-        @keyframes tl-track-glow{
-          0%,100%{box-shadow:0 0 10px rgba(168,85,247,0.45),0 0 22px rgba(239,68,68,0.25)}
-          50%{box-shadow:0 0 16px rgba(192,132,252,0.65),0 0 32px rgba(239,68,68,0.38)}
+        @keyframes tl-legend-pulse { 0%,100%{opacity:.65} 50%{opacity:1} }
+        @keyframes tl-track-glow {
+          0%,100%{ box-shadow:0 0 10px rgba(168,85,247,.45) }
+          50%    { box-shadow:0 0 16px rgba(192,132,252,.65) }
         }
-
-        .tl-underline-bar{
+        .tl-underline-bar {
           width:210px; height:3px; margin:16px auto 0;
           background:linear-gradient(90deg,#7e22ce,#dc2626,#ea580c,#dc2626,#7e22ce);
           background-size:200% 100%; border-radius:2px;
           animation:tl-underline-flame 3.2s ease-in-out infinite;
         }
-
-        @media(max-width:680px){
-          .tl-two-col{grid-template-columns:1fr !important}
-          .tl-items{padding-left:34px !important}
-          .tl-track{left:10px !important}
-        }
       `}</style>
 
-      {/* Background is transparent — inherits page bg */}
-      <section
-        ref={containerRef}
-        style={{ position: "relative", padding: "60px 0 90px", overflow: "hidden", background: "transparent" }}
-      >
-        {/* Parallax purple-crimson shard */}
-        <motion.div style={{
-          y: bgY,
-          position: "absolute", top: "12%", right: "-6%",
-          width: "38vw", height: "38vw", borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(120,0,200,0.08) 0%, rgba(200,0,0,0.05) 50%, transparent 70%)",
-          pointerEvents: "none", willChange: "transform",
-        }} />
-        <motion.div style={{
-          y: useTransform(scrollYProgress, [0,1], [-20,20]),
-          position: "absolute", bottom: "15%", left: "-4%",
-          width: "28vw", height: "28vw", borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(168,85,247,0.07) 0%, transparent 70%)",
-          pointerEvents: "none", willChange: "transform",
-        }} />
+      <section ref={containerRef} className="relative overflow-hidden py-16"
+        style={{ background: "transparent" }}>
 
-        <div style={{ maxWidth: 1020, margin: "0 auto", padding: "0 20px" }}>
+        {/* Parallax blobs */}
+        <motion.div
+          style={{ y: bgY1, willChange: "transform", position: "absolute", pointerEvents: "none",
+            borderRadius: "50%", top: "12%", right: "-6%", width: "38vw", height: "38vw",
+            background: "radial-gradient(circle,rgba(120,0,200,.08) 0%,rgba(200,0,0,.05) 50%,transparent 70%)",
+          }} />
+        <motion.div
+          style={{ y: bgY2, willChange: "transform", position: "absolute", pointerEvents: "none",
+            borderRadius: "50%", bottom: "15%", left: "-4%", width: "28vw", height: "28vw",
+            background: "radial-gradient(circle,rgba(168,85,247,.07) 0%,transparent 70%)",
+          }} />
 
-          {/* ── Header ── */}
+        <div className="relative mx-auto px-5" style={{ maxWidth: 1020 }}>
+
+          {/* Header */}
           <motion.div
-            initial={{ opacity: 0, y: -22 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, margin: "-50px" }}
+            initial={{ opacity: 0, y: -22 }} whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.52, ease: [0.22, 1, 0.36, 1] }}
-            style={{ textAlign: "center", marginBottom: 20 }}
+            className="text-center mb-5"
           >
-            {/* Pill label */}
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              backgroundColor: "rgba(100,0,160,0.16)",
-              border: "1px solid rgba(168,85,247,0.38)",
-              borderRadius: 6, padding: "5px 18px", marginBottom: 18,
-              fontFamily: "'Rajdhani',sans-serif", fontSize: 11, fontWeight: 700,
-              letterSpacing: "0.22em", textTransform: "uppercase",
-              animation: "tl-pill-flicker 3s ease-in-out infinite",
-            }}>
-              <Radio size={10} color="#a855f7" style={{ filter: "drop-shadow(0 0 4px rgba(168,85,247,0.8))" }} />
+            <div className="inline-flex items-center gap-2 rounded mb-4 uppercase font-bold"
+              style={{
+                fontFamily: "'Rajdhani',sans-serif", fontSize: 11, letterSpacing: "0.22em",
+                backgroundColor: "rgba(100,0,160,.16)",
+                border: "1px solid rgba(168,85,247,.38)",
+                padding: "5px 18px",
+                animation: "tl-pill-flicker 3s ease-in-out infinite",
+              }}>
+              <Radio size={10} color="#a855f7"
+                style={{ filter: "drop-shadow(0 0 4px rgba(168,85,247,.8))" }} />
               Live Schedule Tracker
             </div>
 
-            {/* Main title */}
-            <h2 style={{
-              fontFamily: "'Orbitron',monospace",
-              fontSize: "clamp(1.9rem,5vw,3.4rem)", fontWeight: 900, letterSpacing: "0.1em",
-              backgroundImage: "linear-gradient(135deg,#fff 0%,#fde8ff 14%,#ff3333 42%,#c026d3 68%,#7e22ce 100%)",
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-              margin: 0, lineHeight: 1.1,
-              animation: "tl-glitch 8s ease-in-out infinite, tl-header-fire 4s ease-in-out infinite",
-            }}>
+            <h2 className="m-0 leading-tight uppercase font-black"
+              style={{
+                fontFamily: "'Orbitron',monospace",
+                fontSize: "clamp(1.9rem,5vw,3.4rem)", letterSpacing: "0.1em",
+                backgroundImage: "linear-gradient(135deg,#fff 0%,#fde8ff 14%,#ff3333 42%,#c026d3 68%,#7e22ce 100%)",
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+                animation: "tl-glitch 8s ease-in-out infinite,tl-header-fire 4s ease-in-out infinite",
+              }}>
               EVENT SCHEDULE
             </h2>
 
-            {/* Fire underline */}
             <div className="tl-underline-bar" />
 
-            {/* Live clock */}
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 9, marginTop: 18,
-              backgroundColor: "rgba(0,0,0,0.62)",
-              border: "1px solid rgba(168,85,247,0.20)",
-              borderRadius: 8, padding: "7px 20px",
-              fontFamily: "'Orbitron',monospace", fontSize: 10.5, fontWeight: 700,
-              letterSpacing: "0.12em",
-              animation: "tl-clock-glow 4s ease-in-out infinite",
-              color: "rgba(220,170,255,0.70)",
-            }}>
-              <span style={{
-                width: 7, height: 7, borderRadius: "50%", backgroundColor: "#f97316",
-                boxShadow: "0 0 9px rgba(249,115,22,0.90)", display: "inline-block",
-                animation: "tl-dot-blink 1.4s ease-in-out infinite",
-              }} />
-              {now.toLocaleString("en-IN", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+            <div className="inline-flex items-center gap-2 mt-4 rounded-lg font-bold uppercase"
+              style={{
+                fontFamily: "'Orbitron',monospace", fontSize: 10.5, letterSpacing: "0.12em",
+                backgroundColor: "rgba(0,0,0,.62)",
+                border: "1px solid rgba(168,85,247,.20)",
+                padding: "7px 20px",
+                animation: "tl-clock-glow 4s ease-in-out infinite",
+                color: "rgba(220,170,255,.70)",
+              }}>
+              <span className="inline-block rounded-full"
+                style={{
+                  width: 7, height: 7, backgroundColor: "#f97316",
+                  boxShadow: "0 0 9px rgba(249,115,22,.90)",
+                  animation: "tl-dot-blink 1.4s ease-in-out infinite",
+                }} />
+              {now.toLocaleString("en-IN", {
+                month: "short", day: "numeric", year: "numeric",
+                hour: "2-digit", minute: "2-digit",
+              })}
             </div>
           </motion.div>
 
-          {/* ── Legend ── */}
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8, marginBottom: 52 }}>
+          {/* Legend */}
+          <div className="flex flex-wrap justify-center gap-2 mb-12">
             {([
-              { dot:"#c084fc", glow:"rgba(192,132,252,0.72)", label:"Completed", bg:"rgba(100,0,180,0.10)", border:"rgba(168,85,247,0.28)", ts:"0 0 8px rgba(192,132,252,0.5)" },
-              { dot:"#fb923c", glow:"rgba(251,146,60,0.78)",  label:"Live Now",  bg:"rgba(100,30,0,0.14)",  border:"rgba(251,146,60,0.36)", ts:"0 0 8px rgba(251,146,60,0.6)" },
-              { dot:"#ef4444", glow:"rgba(239,68,68,0.62)",   label:"Upcoming",  bg:"rgba(60,0,0,0.11)",    border:"rgba(239,68,68,0.20)", ts:"0 0 8px rgba(239,68,68,0.4)" },
+              { dot:"#c084fc", glow:"rgba(192,132,252,.72)", label:"Completed",
+                bg:"rgba(100,0,180,.10)", border:"rgba(168,85,247,.28)", ts:"0 0 8px rgba(192,132,252,.5)" },
+              { dot:"#fb923c", glow:"rgba(251,146,60,.78)",  label:"Live Now",
+                bg:"rgba(100,30,0,.14)",  border:"rgba(251,146,60,.36)", ts:"0 0 8px rgba(251,146,60,.6)" },
+              { dot:"#ef4444", glow:"rgba(239,68,68,.62)",   label:"Upcoming",
+                bg:"rgba(60,0,0,.11)",    border:"rgba(239,68,68,.20)",  ts:"0 0 8px rgba(239,68,68,.4)" },
             ] as const).map(s => (
-              <div key={s.label} style={{
-                display: "inline-flex", alignItems: "center", gap: 7,
-                backgroundColor: s.bg, border: `1px solid ${s.border}`,
-                borderRadius: 20, padding: "5px 16px",
-                fontFamily: "'Rajdhani',sans-serif", fontSize: 11, fontWeight: 700,
-                letterSpacing: "0.14em", textTransform: "uppercase",
-                color: "rgba(255,255,255,0.72)", textShadow: s.ts,
-                animation: "tl-legend-pulse 3.5s ease-in-out infinite",
-              }}>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: s.dot, boxShadow: `0 0 7px ${s.glow}`, display: "inline-block" }} />
+              <div key={s.label}
+                className="inline-flex items-center gap-2 rounded-full px-4 py-1 uppercase font-bold"
+                style={{
+                  fontFamily: "'Rajdhani',sans-serif", fontSize: 11, letterSpacing: "0.14em",
+                  backgroundColor: s.bg, border: `1px solid ${s.border}`,
+                  color: "rgba(255,255,255,.72)", textShadow: s.ts,
+                  animation: "tl-legend-pulse 3.5s ease-in-out infinite",
+                }}>
+                <span className="inline-block rounded-full"
+                  style={{ width: 8, height: 8, backgroundColor: s.dot, boxShadow: `0 0 7px ${s.glow}` }} />
                 {s.label}
               </div>
             ))}
           </div>
 
-          {/* ── Day groups ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 58 }}>
+          {/* Day groups */}
+          <div className="flex flex-col gap-14">
             {Object.entries(grouped).map(([day, dayItems], groupIdx) => (
               <div key={day}>
 
-                {/* Day header */}
+                {/* Day label */}
                 <motion.div
-                  initial={{ opacity: 0, x: -26 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: false, margin: "-40px" }}
+                  initial={{ opacity: 0, x: -26 }} whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
                   transition={{ type: "spring", stiffness: 220, damping: 26, delay: groupIdx * 0.06 }}
-                  style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 32 }}
+                  className="flex items-center gap-3 mb-8"
                 >
-                  <div style={{
-                    fontFamily: "'Orbitron',monospace",
-                    fontSize: "clamp(0.65rem,1.6vw,0.82rem)", fontWeight: 700, letterSpacing: "0.14em",
-                    textTransform: "uppercase", whiteSpace: "nowrap",
-                    animation: "tl-day-glow 4s ease-in-out infinite",
-                  }}>
+                  <div className="uppercase font-bold whitespace-nowrap"
+                    style={{
+                      fontFamily: "'Orbitron',monospace",
+                      fontSize: "clamp(0.65rem,1.6vw,0.82rem)", letterSpacing: "0.14em",
+                      animation: "tl-day-glow 4s ease-in-out infinite",
+                    }}>
                     {day}
                   </div>
-                  <div style={{
-                    flex: 1, height: 1,
-                    background: "linear-gradient(90deg,rgba(147,51,234,0.40),rgba(239,68,68,0.22),transparent)",
-                    boxShadow: "0 0 6px rgba(147,51,234,0.18)",
-                  }} />
-                  <ChevronRight size={13} color="rgba(168,85,247,0.42)" />
+                  <div className="flex-1 h-px"
+                    style={{ background: "linear-gradient(90deg,rgba(147,51,234,.40),rgba(239,68,68,.22),transparent)" }} />
+                  <ChevronRight size={13} color="rgba(168,85,247,.42)" />
                 </motion.div>
 
-                {/* Items + track */}
-                <div className="tl-items" style={{ position: "relative", paddingLeft: 46 }}>
-                  {/* Track */}
-                  <div
-                    className="tl-track"
-                    ref={groupIdx === 0 ? trackRef : undefined}
-                    style={{ position: "absolute", left: 16, top: 0, bottom: 0, width: 2, background: "rgba(100,0,100,0.10)", pointerEvents: "none" }}
-                  >
-                    <div style={{
-                      position: "absolute", left: 0, width: "100%", height: 60,
-                      background: "linear-gradient(180deg,transparent,rgba(168,85,247,0.22),rgba(239,68,68,0.16),transparent)",
-                      animation: "tl-scanline 4.8s linear infinite",
-                    }} />
-                    {groupIdx === 0 && (
-                      <motion.div
-                        animate={{ height: progressH }}
-                        transition={{ duration: 1.6, ease: "easeInOut" }}
-                        style={{
-                          position: "absolute", left: 0, top: 0, width: 2,
-                          background: "linear-gradient(180deg,#a855f7,#ec4899,#ef4444,#f97316)",
-                          animation: "tl-track-glow 3s ease-in-out infinite",
-                        }}
-                      />
-                    )}
-                  </div>
-
-                  {/* Two-col grid */}
-                  <motion.div
-                    className="tl-two-col"
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, margin: "-30px" }}
-                    variants={{
-                      hidden: {},
-                      visible: { transition: { staggerChildren: 0.07 } },
-                    }}
-                    style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
-                  >
-                    {dayItems.map((item, i) => (
-                      <TimelineCard key={item.id} item={item} index={i} now={now} />
-                    ))}
-                  </motion.div>
-                </div>
+                {/* Cards grid — no external track; node lives inside each card */}
+                <motion.div
+                  initial="hidden" whileInView="visible"
+                  viewport={{ once: true, margin: "-30px" }}
+                  variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
+                  className="grid gap-3 items-stretch"
+                  style={{
+                    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))",
+                  }}
+                >
+                  {dayItems.map((item, i) => (
+                    <TimelineCard key={item.id} item={item} index={i} now={now} />
+                  ))}
+                </motion.div>
               </div>
             ))}
           </div>
@@ -688,29 +539,35 @@ export default function GlowingTimeline({ items }: TimelineProps) {
 }
 
 /* ─────────────────────────────────────────
-   Demo export
+   Demo — dates fully consistent, no month mismatch
 ───────────────────────────────────────── */
 function TimelineDemo() {
+  const D1 = "2026-04-02";
+  const D2 = "2026-04-03";
+  const t  = (date: string, h: number, m = 0) =>
+    new Date(`${date}T${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:00`).toISOString();
+
   const items: TimelineItem[] = [
-    { id:"1",  title:"Inauguration Ceremony", startTime:new Date(2026,3,2,10,0).toISOString(),  endTime:new Date(2026,3,2,11,0).toISOString(),  venue:"Dr. Triguna Sen Auditorium", tag:"Opening", description:"Official inauguration of Metallix 2026." },
-    { id:"2",  title:"Conveynor Speech",       startTime:new Date(2026,3,2,11,0).toISOString(),  endTime:new Date(2026,3,2,12,0).toISOString(),  venue:"Dr. Triguna Sen Auditorium", tag:"Seminar" },
-    { id:"3",  title:"Faculty Advisory Speech",startTime:new Date(2026,3,2,12,0).toISOString(),  endTime:new Date(2026,3,2,12,30).toISOString(), venue:"Dr. Triguna Sen Auditorium", tag:"Seminar" },
-    { id:"4",  title:"VC, Pro VC, Dean",       startTime:new Date(2026,3,2,12,30).toISOString(), endTime:new Date(2026,3,2,13,30).toISOString(), venue:"Dr. Triguna Sen Auditorium", tag:"Seminar" },
-    { id:"5",  title:"Technical Session 1",    startTime:new Date(2026,3,2,13,30).toISOString(), endTime:new Date(2026,3,2,14,30).toISOString(), venue:"Dr. Triguna Sen Auditorium", tag:"Seminar" },
-    { id:"6",  title:"Lunch",                  startTime:new Date(2026,3,2,14,30).toISOString(), endTime:new Date(2026,3,2,15,30).toISOString(), venue:"JU Guest House",             tag:"Break" },
-    { id:"7",  title:"Technical Session 2",    startTime:new Date(2026,3,2,15,30).toISOString(), endTime:new Date(2026,3,2,18,0).toISOString(),  venue:"Dr. Triguna Sen Auditorium", tag:"Seminar" },
-    { id:"8",  title:"CODEMET",                startTime:new Date(2026,3,2,18,30).toISOString(), endTime:new Date(2026,3,2,20,0).toISOString(),  venue:"MetE Dept.",                 tag:"Event" },
-    { id:"9",  title:"HACKMET",                startTime:new Date(2026,3,2,20,0).toISOString(),  endTime:new Date(2026,3,2,22,0).toISOString(),  venue:"MetE Dept.",                 tag:"Event" },
-    { id:"10", title:"Golazo",                 startTime:new Date(2026,3,3,10,0).toISOString(),  endTime:new Date(2026,3,3,11,0).toISOString(),  venue:"MetE Dept.",                 tag:"Event" },
-    { id:"11", title:"Wall Street",            startTime:new Date(2026,3,3,11,0).toISOString(),  endTime:new Date(2026,3,3,12,0).toISOString(),  venue:"K.P Basu Memorial Hall",     tag:"Event" },
-    { id:"12", title:"Specio",                 startTime:new Date(2026,3,3,12,0).toISOString(),  endTime:new Date(2026,3,3,12,30).toISOString(), venue:"K.P Basu Memorial Hall",     tag:"Event" },
-    { id:"13", title:"Scribe",                 startTime:new Date(2026,3,3,12,30).toISOString(), endTime:new Date(2026,3,3,13,0).toISOString(),  venue:"K.P Basu Memorial Hall",     tag:"Event" },
-    { id:"14", title:"Scroll",                 startTime:new Date(2026,3,3,13,0).toISOString(),  endTime:new Date(2026,3,3,13,30).toISOString(), venue:"K.P Basu Memorial Hall",     tag:"Event" },
-    { id:"15", title:"Talaash",                startTime:new Date(2026,3,3,13,30).toISOString(), endTime:new Date(2026,3,3,14,30).toISOString(), venue:"K.P Basu Memorial Hall",     tag:"Event" },
-    { id:"16", title:"Lunch",                  startTime:new Date(2026,3,3,14,30).toISOString(), endTime:new Date(2026,3,3,15,30).toISOString(), venue:"JU Guest House",             tag:"Break" },
-    { id:"17", title:"Gnosis",                 startTime:new Date(2026,3,3,15,30).toISOString(), endTime:new Date(2026,3,3,17,0).toISOString(),  venue:"K.P Basu Memorial Hall",     tag:"Event" },
-    { id:"18", title:"Closing Ceremony",       startTime:new Date(2026,3,3,17,0).toISOString(),  endTime:new Date(2026,3,3,18,0).toISOString(),  venue:"K.P Basu Memorial Hall",     tag:"Event" },
+    { id:"1",  title:"Inauguration Ceremony",  startTime:t(D1,10),    endTime:t(D1,11),    venue:"Dr. Triguna Sen Auditorium", tag:"Opening",  description:"Official inauguration of Metallix 2026." },
+    { id:"2",  title:"Conveynor Speech",        startTime:t(D1,11),    endTime:t(D1,12),    venue:"Dr. Triguna Sen Auditorium", tag:"Seminar"  },
+    { id:"3",  title:"Faculty Advisory Speech", startTime:t(D1,12),    endTime:t(D1,12,30), venue:"Dr. Triguna Sen Auditorium", tag:"Seminar"  },
+    { id:"4",  title:"VC, Pro VC, Dean",        startTime:t(D1,12,30), endTime:t(D1,13,30), venue:"Dr. Triguna Sen Auditorium", tag:"Seminar"  },
+    { id:"5",  title:"Technical Session 1",     startTime:t(D1,13,30), endTime:t(D1,14,30), venue:"Dr. Triguna Sen Auditorium", tag:"Seminar"  },
+    { id:"6",  title:"Lunch",                   startTime:t(D1,14,30), endTime:t(D1,15,30), venue:"JU Guest House",             tag:"Break"    },
+    { id:"7",  title:"Technical Session 2",     startTime:t(D1,15,30), endTime:t(D1,18),    venue:"Dr. Triguna Sen Auditorium", tag:"Seminar"  },
+    { id:"8",  title:"CODEMET",                 startTime:t(D1,18,30), endTime:t(D1,20),    venue:"MetE Dept.",                 tag:"Event"    },
+    { id:"9",  title:"HACKMET",                 startTime:t(D1,20),    endTime:t(D1,22),    venue:"MetE Dept.",                 tag:"Event"    },
+    { id:"10", title:"Golazo",                  startTime:t(D2,10),    endTime:t(D2,11),    venue:"MetE Dept.",                 tag:"Event"    },
+    { id:"11", title:"Wall Street",             startTime:t(D2,11),    endTime:t(D2,12),    venue:"K.P Basu Memorial Hall",     tag:"Event"    },
+    { id:"12", title:"Specio",                  startTime:t(D2,12),    endTime:t(D2,12,30), venue:"K.P Basu Memorial Hall",     tag:"Event"    },
+    { id:"13", title:"Scribe",                  startTime:t(D2,12,30), endTime:t(D2,13),    venue:"K.P Basu Memorial Hall",     tag:"Event"    },
+    { id:"14", title:"Scroll",                  startTime:t(D2,13),    endTime:t(D2,13,30), venue:"K.P Basu Memorial Hall",     tag:"Event"    },
+    { id:"15", title:"Talaash",                 startTime:t(D2,13,30), endTime:t(D2,14,30), venue:"K.P Basu Memorial Hall",     tag:"Event"    },
+    { id:"16", title:"Lunch",                   startTime:t(D2,14,30), endTime:t(D2,15,30), venue:"JU Guest House",             tag:"Break"    },
+    { id:"17", title:"Gnosis",                  startTime:t(D2,15,30), endTime:t(D2,17),    venue:"K.P Basu Memorial Hall",     tag:"Event"    },
+    { id:"18", title:"Closing Ceremony",        startTime:t(D2,17),    endTime:t(D2,18),    venue:"K.P Basu Memorial Hall",     tag:"Event"    },
   ];
+
   return <GlowingTimeline items={items} />;
 }
 
