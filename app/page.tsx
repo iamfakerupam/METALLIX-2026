@@ -10,7 +10,7 @@ import { HeroVideoDemo } from "./Hero";
 import Navbar from "@/components/Navbar";
 import MetallixFooter from "@/components/Footer";
 import ContactUsSection from "@/components/contactSection";
-import LoadingGate from "./LoadingGate";
+import LoadingGate from "./LoadingGate";;
 
 /* ══════════════════════════════════════════════════════
    FIRE SPRINKLES CANVAS
@@ -181,6 +181,7 @@ export default function Home() {
 
         <section id="home"><HeroVideoDemo /></section>
         <SplashCursor />
+      
 
         <div
           className="relative min-h-screen font-sans overflow-x-hidden"

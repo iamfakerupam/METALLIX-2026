@@ -1,7 +1,7 @@
 'use client'
 
 import { EventCountdownCard } from '@/components/event-countdown-card'
-import SmoothScrollWrapper from '@/components/Smoothscrollwrapper'
+import { SmoothCursor } from '@/components/ui/smooth-cursor'
 import React from 'react'
 
 const events = [
@@ -19,6 +19,7 @@ const events = [
 export default function Event() {
   return (
     <>
+      <SmoothCursor/>
       <div
         className="relative min-h-screen overflow-x-hidden bg-black"
         style={{ background: 'linear-gradient(160deg, #0a0015 0%, #050008 40%, #0d0000 100%)' }}
